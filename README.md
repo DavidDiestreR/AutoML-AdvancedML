@@ -1,2 +1,2 @@
-# AutoML-AdvancedML
+﻿# AutoML-AdvancedML
 Course project for the Machine Learning (Advanced) class at CEU. This repository implements a simple AutoML framework for regression using simulated annealing to select models and tune hyperparameters, with different temperature multipliers for model and hyperparameter changes. The approach is compared with TPOT and auto-sklearn.

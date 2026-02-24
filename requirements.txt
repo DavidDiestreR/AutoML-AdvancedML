@@ -1,0 +1,62 @@
+﻿# ================================
+# AutoML Project 1 - requirements
+# ================================
+# Base reference (you may not need to install EVERYTHING at once on Windows).
+# Recommendation: create a virtual environment and try the "Core" block first.
+#
+# Example:
+#   python -m venv .venv
+#   .venv\Scripts\activate
+#   pip install -U pip setuptools wheel
+#   pip install -r requirements.txt
+#
+# Important (Windows): auto-sklearn often requires Linux/WSL.
+# You can comment that block out if you are working on native Windows only.
+
+# -------- Core / utilities --------
+pip>=24.0
+setuptools>=68
+wheel>=0.41
+
+# -------- Data science (base) --------
+numpy>=1.24,<3.0
+pandas>=2.0,<3.0
+scipy>=1.10,<2.0
+scikit-learn>=1.3,<1.7
+joblib>=1.3
+
+# -------- Visualization --------
+matplotlib>=3.7
+seaborn>=0.12
+plotly>=5.18
+
+# -------- Notebooks --------
+jupyter>=1.0
+notebook>=7.0
+ipykernel>=6.0
+
+# -------- Metrics / reporting --------
+imbalanced-learn>=0.11
+
+# -------- AutoML (lightweight and practical) --------
+# Useful for `automl.py` if you want FLAML as an AutoML baseline.
+flaml[automl]>=2.1
+
+# -------- TPOT --------
+# TPOT can take a long time; adjust generations/population in the script.
+tpot>=0.12
+
+# -------- auto-sklearn (usually Linux/WSL) --------
+# If you are on native Windows, comment these lines and run that script in WSL/Ubuntu.
+auto-sklearn>=0.15
+liac-arff>=2.5
+pynisher>=0.6
+smac>=1.4,<2.0
+
+# -------- Export / formats --------
+openpyxl>=3.1
+pyarrow>=14.0
+
+# -------- Code quality (optional, but recommended) --------
+black>=24.0
+ruff>=0.3
