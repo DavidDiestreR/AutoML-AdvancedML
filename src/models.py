@@ -199,7 +199,7 @@ class RandomForestRegressorSA:
         n_estimators_bounds: tuple[int, int] = (50, 500),
         max_depth_bounds: tuple[int, int] = (2, 30),
         min_samples_leaf_bounds: tuple[int, int] = (1, 20),
-        use_scaler: bool = True,
+        use_scaler: bool = False,
         random_state: int | None = 0,
         n_jobs: int = -1,
     ):
