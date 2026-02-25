@@ -14,9 +14,9 @@ def cross_validate_regression_model(
     X_train,
     y_train,
     model_params: Dict[str, Any] | None = None,
-) -> Dict[str, object]:
+) -> float:
     """Run manual CV for a regression model using a provided splitter."""
-    
+
     normalized_name = model_name.strip().lower()
     params = dict(model_params or {})
     model_map = {
@@ -47,8 +47,5 @@ def cross_validate_regression_model(
         fold_rmses.append(float(fold_rmse))
 
     rmse_array = np.array(fold_rmses, dtype=float)
-    return {
-        "model_name": normalized_name,
-        "params": params,
-        "rmse": float(rmse_array.mean())
-    }
+    
+    return float(rmse_array.mean())

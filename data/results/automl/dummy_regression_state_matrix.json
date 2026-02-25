@@ -1,0 +1,42 @@
+{
+  "0": {
+    "ridge": {
+      "params": {
+        "alpha": 1.0
+      },
+      "rmse": 1.057670153481165,
+      "current_model": false
+    },
+    "knn": {
+      "params": {
+        "n_neighbors": 5,
+        "weights": "uniform",
+        "p": 2
+      },
+      "rmse": 5.342763311325852,
+      "current_model": false
+    },
+    "randomforest": {
+      "params": {
+        "n_estimators": 200,
+        "max_depth": null,
+        "min_samples_leaf": 1,
+        "max_features": "sqrt"
+      },
+      "rmse": 4.340899739280095,
+      "current_model": false
+    },
+    "mlp": {
+      "params": {
+        "hidden_layer_sizes": [
+          64
+        ],
+        "activation": "relu",
+        "alpha": 0.0001,
+        "learning_rate_init": 0.01
+      },
+      "rmse": 3.8450123028193017,
+      "current_model": true
+    }
+  }
+}

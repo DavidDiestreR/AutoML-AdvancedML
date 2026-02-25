@@ -1,0 +1,9 @@
+{
+  "elapsed_time": 1.7362746999997398,
+  "num_iter": 0,
+  "best_model": "ridge",
+  "params": {
+    "alpha": 1.0
+  },
+  "rms": 1.057670153481165
+}

@@ -334,7 +334,7 @@ class MLP:
         hidden_layer_sizes: tuple[int, ...] = (64,),   # keep 1-2 layers
         activation: str = "relu",                      # "relu" or "tanh"
         alpha: float = 1e-4,                           # L2 regularization
-        learning_rate_init: float = 1e-3,
+        learning_rate_init: float = 1e-2,
         max_iter: int = 300,
         early_stopping: bool = True,
         validation_fraction: float = 0.15,
