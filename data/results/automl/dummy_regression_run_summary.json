@@ -1,9 +1,9 @@
 {
-  "elapsed_time": 1.7362746999997398,
-  "num_iter": 0,
+  "elapsed_time": 423.2936288000001,
+  "num_iter": 6905,
   "best_model": "ridge",
   "params": {
-    "alpha": 1.0
+    "alpha": 8.144955505647043e-07
   },
-  "rms": 1.057670153481165
+  "rmse": 0.7543988244221469
 }

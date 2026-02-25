@@ -310,7 +310,8 @@ class RandomForestRegressorSA:
             choices = ["sqrt", "log2", 0.5, 1.0]
             # pick a different one than current
             choices = [c for c in choices if c != new_max_features]
-            new_max_features = rng.choice(choices)
+            # Choose by index to avoid NumPy coercing mixed types to strings (e.g. 0.5 -> "0.5")
+            new_max_features = choices[int(rng.integers(0, len(choices)))]
 
         return {
             "n_estimators": new_n_estimators,

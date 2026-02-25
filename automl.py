@@ -67,7 +67,7 @@ def _load_processed_dataset(data_path: Path, dataset_name: str):
 
 def _decrease_temperature(
     temperature: float,
-    cooling_rate: float = 0.95,
+    cooling_rate: float = 0.999,
     min_temperature: float = 1e-3,
 ) -> float:
     """Geometric cooling schedule: T_{t+1} = max(T_min, cooling_rate * T_t)."""
@@ -133,8 +133,8 @@ def _generate_neighboring_state(
 def main(
     dataset_name: str,
     k_fold: int = 5,
-    temperature: float = 1.0,
-    model_temperature_factor: float = 1.5,
+    temperature: float = 100.0,
+    model_temperature_factor: float = 5,
     p_change_model: float = 0.2,
     min_temperature: float = 1e-3,
     seed: int | None = None,
@@ -200,7 +200,65 @@ def main(
         raise ValueError("state_matrix row must contain exactly one current_model=True.")
     t = 0
 
+
     # =========================== AUTOML ===========================
+    while temperature > min_temperature:
+        current_row = state_matrix[t]
+        current_rmse = float(current_row[current_model]["rmse"])
+
+        proposed_state = _generate_neighboring_state(
+            current_iteration_row=current_row,
+            p_change_model=p_change_model,
+            rng=rng,
+        )
+        proposed_model = str(proposed_state["model"])
+        proposed_params = copy.deepcopy(proposed_state["params"])
+        is_model_change = proposed_model != current_model
+
+        # If the proposal is a pure model switch, reuse the RMSE already stored in the row.
+        if is_model_change:
+            proposed_rmse = float(current_row[proposed_model]["rmse"])
+        else:
+            proposed_rmse = cross_validate_regression_model(
+                model_name=proposed_model,
+                cv=cv,
+                X_train=X_train,
+                y_train=y_train,
+                model_params=proposed_params,
+            )
+
+        delta_rmse = proposed_rmse - current_rmse
+        effective_temperature = (
+            temperature * model_temperature_factor if is_model_change else temperature
+        )
+
+        if delta_rmse < 0:
+            accept = True
+        else:
+            acceptance_prob = float(np.exp(-delta_rmse / effective_temperature))
+            accept = rng.random() < acceptance_prob
+
+        next_row = copy.deepcopy(current_row)
+        for model_name in next_row:
+            next_row[model_name]["current_model"] = False
+
+        if accept:
+            next_row[proposed_model]["params"] = proposed_params
+            next_row[proposed_model]["rmse"] = proposed_rmse
+            next_row[proposed_model]["current_model"] = True
+            current_model = proposed_model
+        else:
+            next_row[current_model]["current_model"] = True
+
+        if sum(int(v["current_model"]) for v in next_row.values()) != 1:
+            raise ValueError("state_matrix row must contain exactly one current_model=True.")
+
+        t += 1
+        state_matrix[t] = next_row
+        temperature = _decrease_temperature(
+            temperature=temperature,
+            min_temperature=min_temperature,
+        )
 
 
     # =========================== RESULTS ===========================
@@ -220,7 +278,7 @@ def main(
         "num_iter": int(last_iteration),
         "best_model": best_model_name,
         "params": best_model_state["params"],
-        "rms": best_model_state["rmse"],
+        "rmse": best_model_state["rmse"],
     }
 
     state_matrix_file = results_path / f"{dataset_file.stem}_state_matrix.json"
@@ -232,7 +290,7 @@ def main(
         json.dump(run_summary, f, indent=2, default=_json_default)
 
     print(
-        "Implementation pending.\n"
+        "AutoML run finished.\n"
         f" Project root: {project_root}\n"
         f" Data folder: {data_path}\n"
         f" Results folder: {results_path}\n"
@@ -240,17 +298,16 @@ def main(
         f" target_col: {target_col}\n"
         f" dataset_name: {dataset_name}\n"
         f" k_fold: {k_fold}\n"
-        f" temperature: {temperature}\n"
+        f" final_temperature: {temperature}\n"
         f" model_temperature_factor: {model_temperature_factor}\n"
         f" p_change_model: {p_change_model}\n"
         f" min_temperature: {min_temperature}\n"
         f" seed: {seed}\n"
-        f" current_model (initialized): {current_model}\n"
-        f" t (initialized): {t}\n"
+        f" current_model (final): {current_model}\n"
+        f" t (final): {t}\n"
         f" state_matrix_file: {state_matrix_file}\n"
         f" run_summary_file: {summary_file}\n"
-        f" run_summary:\n{pformat(run_summary, sort_dicts=False)}\n"
-        f" state_matrix:\n{pformat(state_matrix, sort_dicts=False)}"
+        f" run_summary:\n{pformat(run_summary, sort_dicts=False)}"
     )
 
 
@@ -281,8 +338,8 @@ if __name__ == "__main__":
         "-m",
         "--model-temperature-factor",
         type=float,
-        default=1.5,
-        help="Positive factor (>0) to scale model-change exploration temperature (default: 1.5).",
+        default=5.0,
+        help="Positive factor (>0) to scale model-change exploration temperature (default: 5.0).",
     )
     parser.add_argument(
         "-p",
