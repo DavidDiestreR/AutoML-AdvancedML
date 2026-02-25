@@ -16,7 +16,7 @@ def main() -> None:
     # TODO: load X_train, X_test, y_train, y_test from `data/processed/`
     # TODO: train AutoML (for example, FLAML)
     # TODO: save metrics/predictions to `results_path`
-    print(f"Implementation pending. Data folder: {data_path}")
+    print(f"Implementation pending.\n Project root: {project_root}\n Data folder: {data_path}\n Results folder: {results_path}")
 
 
 if __name__ == "__main__":
