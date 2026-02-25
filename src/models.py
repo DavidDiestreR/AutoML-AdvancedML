@@ -81,14 +81,7 @@ class RidgeRegressor:
         # if rng.random() < 0.03:
         #     new_fit_intercept = not new_fit_intercept
 
-        return RidgeRegressor(
-            alpha=new_alpha,
-            fit_intercept=new_fit_intercept,
-            alpha_bounds=self.alpha_bounds,
-            log_step=self.log_step,
-            use_scaler=self.use_scaler,
-            random_state=self.random_state,
-        )
+        return {"alpha": new_alpha}
 
 class KNNRegressor:
     """
@@ -180,13 +173,11 @@ class KNNRegressor:
             # toggle distance type (Manhattan vs Euclidean)
             new_p = 1 if new_p == 2 else 2
 
-        return KNNRegressor(
-            n_neighbors=new_k,
-            weights=new_weights,
-            p=new_p,
-            k_bounds=self.k_bounds,
-            use_scaler=self.use_scaler,
-        )
+        return {
+            "n_neighbors": new_k,
+            "weights": new_weights,
+            "p": new_p
+        }
 
 
 class RandomForestRegressorSA:
@@ -321,18 +312,12 @@ class RandomForestRegressorSA:
             choices = [c for c in choices if c != new_max_features]
             new_max_features = rng.choice(choices)
 
-        return RandomForestRegressorSA(
-            n_estimators=new_n_estimators,
-            max_depth=new_max_depth,
-            min_samples_leaf=new_min_samples_leaf,
-            max_features=new_max_features,
-            n_estimators_bounds=self.n_estimators_bounds,
-            max_depth_bounds=self.max_depth_bounds,
-            min_samples_leaf_bounds=self.min_samples_leaf_bounds,
-            use_scaler=self.use_scaler,
-            random_state=self.random_state,
-            n_jobs=self.n_jobs,
-        )
+        return {
+            "n_estimators": new_n_estimators,
+            "max_depth": new_max_depth,
+            "min_samples_leaf": new_min_samples_leaf,
+            "max_features": new_max_features
+        }
 
 class MLP:
     """
@@ -355,7 +340,7 @@ class MLP:
         validation_fraction: float = 0.15,
         n_iter_no_change: int = 10,
         bounds_units: tuple[int, int] = (8, 256),
-        bounds_layers: tuple[int, int] = (1, 2),
+        bounds_layers: tuple[int, int] = (1, 4),
         alpha_bounds: tuple[float, float] = (1e-8, 1e1),
         lr_bounds: tuple[float, float] = (1e-5, 5e-1),
         log_step_alpha: float = 0.5,
@@ -496,21 +481,9 @@ class MLP:
             # rare activation toggle
             new_activation = "tanh" if new_activation == "relu" else "relu"
 
-        return MLP(
-            hidden_layer_sizes=new_arch,
-            activation=new_activation,
-            alpha=float(new_alpha),
-            learning_rate_init=float(new_lr),
-            max_iter=self.max_iter,
-            early_stopping=self.early_stopping,
-            validation_fraction=self.validation_fraction,
-            n_iter_no_change=self.n_iter_no_change,
-            bounds_units=self.bounds_units,
-            bounds_layers=self.bounds_layers,
-            alpha_bounds=self.alpha_bounds,
-            lr_bounds=self.lr_bounds,
-            log_step_alpha=self.log_step_alpha,
-            log_step_lr=self.log_step_lr,
-            use_scaler=self.use_scaler,
-            random_state=self.random_state,
-        )
+        return {
+            "hidden_layer_sizes": new_arch,
+            "activation": new_activation,
+            "alpha": float(new_alpha),
+            "learning_rate_init": float(new_lr)
+        }
