@@ -1,7 +1,14 @@
-"""AutoML training (e.g., FLAML).
+"""Custom AutoML search with simulated annealing.
 
-Short idea: load the processed dataset, train AutoML, and save metrics
-+ model/results in `data/results/automl/`.
+This script loads a processed regression dataset, runs a local AutoML search
+over multiple model families and their hyperparameters, and saves the search
+trajectory/results in `data/results/automl/`.
+
+The search uses simulated annealing acceptance, with a separate temperature
+scaling factor for model-change proposals (to encourage switching between
+model families independently from hyperparameter moves). Temperature is
+decreased with a time-based schedule, so it cools as execution time advances
+towards the configured runtime budget.
 """
 
 import argparse
