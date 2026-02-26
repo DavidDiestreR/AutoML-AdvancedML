@@ -66,14 +66,26 @@ def _load_processed_dataset(data_path: Path, dataset_name: str):
 
 
 def _decrease_temperature(
-    temperature: float,
-    cooling_rate: float = 0.999,
+    initial_temperature: float,
+    elapsed_time: float,
+    execution_time: float = 3600.0,
     min_temperature: float = 1e-3,
 ) -> float:
-    """Geometric cooling schedule: T_{t+1} = max(T_min, cooling_rate * T_t)."""
-    if not (0 < cooling_rate < 1):
-        raise ValueError("cooling_rate must be in (0, 1).")
-    return max(min_temperature, cooling_rate * temperature)
+    """Time-based exponential cooling: reach T_min at `execution_time` seconds."""
+    if execution_time <= 0:
+        raise ValueError("execution_time must be > 0.")
+    if elapsed_time <= 0:
+        return float(max(min_temperature, initial_temperature))
+    if elapsed_time >= execution_time:
+        return float(min_temperature)
+    if initial_temperature <= 0:
+        raise ValueError("initial_temperature must be > 0.")
+    if initial_temperature < min_temperature:
+        raise ValueError("initial_temperature must be >= min_temperature.")
+    progress = float(np.clip(elapsed_time / execution_time, 0.0, 1.0))
+    # Exponential interpolation in log-space keeps exploration higher early on.
+    temperature = initial_temperature * ((min_temperature / initial_temperature) ** progress)
+    return float(max(min_temperature, temperature))
 
 
 def _generate_neighboring_state(
@@ -132,10 +144,11 @@ def _generate_neighboring_state(
 
 def main(
     dataset_name: str,
-    k_fold: int = 5,
-    temperature: float = 100.0,
-    model_temperature_factor: float = 5,
-    p_change_model: float = 0.2,
+    k_fold: int = 3,
+    temperature: float = 0.3,
+    model_temperature_factor: float = 6.0,
+    p_change_model: float = 0.35,
+    execution_time: float = 3600.0,
     min_temperature: float = 1e-3,
     seed: int | None = None,
 ) -> None:
@@ -151,11 +164,16 @@ def main(
         raise ValueError("p_change_model must be between 0 and 1.")
     if temperature <= 0:
         raise ValueError("temperature must be > 0.")
+    if execution_time <= 0:
+        raise ValueError("execution_time must be > 0.")
     if min_temperature <= 0:
         raise ValueError("min_temperature must be > 0.")
+    if temperature < min_temperature:
+        raise ValueError("temperature must be >= min_temperature.")
     if model_temperature_factor <= 0:
         raise ValueError("model_temperature_factor must be > 0.")
     rng = np.random.default_rng(seed)
+    initial_temperature = float(temperature)
 
     project_root = Path(__file__).resolve().parent
     data_path = project_root / "data" / "processed"
@@ -202,6 +220,7 @@ def main(
 
 
     # =========================== AUTOML ===========================
+    automl_start_time = time.perf_counter()
     while temperature > min_temperature:
         current_row = state_matrix[t]
         current_rmse = float(current_row[current_model]["rmse"])
@@ -256,7 +275,9 @@ def main(
         t += 1
         state_matrix[t] = next_row
         temperature = _decrease_temperature(
-            temperature=temperature,
+            initial_temperature=initial_temperature,
+            elapsed_time=time.perf_counter() - automl_start_time,
+            execution_time=execution_time,
             min_temperature=min_temperature,
         )
 
@@ -301,6 +322,7 @@ def main(
         f" final_temperature: {temperature}\n"
         f" model_temperature_factor: {model_temperature_factor}\n"
         f" p_change_model: {p_change_model}\n"
+        f" execution_time: {execution_time}\n"
         f" min_temperature: {min_temperature}\n"
         f" seed: {seed}\n"
         f" current_model (final): {current_model}\n"
@@ -324,29 +346,36 @@ if __name__ == "__main__":
         "-k",
         "--k-fold",
         type=int,
-        default=5,
-        help="Number of CV folds (default: 5).",
+        default=3,
+        help="Number of CV folds (default: 3).",
     )
     parser.add_argument(
         "-T",
         "--temperature",
         type=float,
-        default=1.0,
-        help="Initial temperature for the search (default: 1.0).",
+        default=0.3,
+        help="Initial temperature for the search (default: 0.3).",
     )
     parser.add_argument(
         "-m",
         "--model-temperature-factor",
         type=float,
-        default=5.0,
-        help="Positive factor (>0) to scale model-change exploration temperature (default: 5.0).",
+        default=6.0,
+        help="Positive factor (>0) to scale model-change exploration temperature (default: 6.0).",
     )
     parser.add_argument(
         "-p",
         "--p-change-model",
         type=float,
-        default=0.2,
-        help="Probability of proposing a model change (default: 0.2).",
+        default=0.35,
+        help="Probability of proposing a model change (default: 0.35).",
+    )
+    parser.add_argument(
+        "-e",
+        "--execution-time",
+        type=float,
+        default=3600.0,
+        help="Target runtime in seconds to cool temperature down to Tmin (default: 3600).",
     )
     parser.add_argument(
         "-t",
@@ -370,6 +399,7 @@ if __name__ == "__main__":
         temperature=args.temperature,
         model_temperature_factor=args.model_temperature_factor,
         p_change_model=args.p_change_model,
+        execution_time=args.execution_time,
         min_temperature=args.min_temperature,
         seed=args.seed,
     )

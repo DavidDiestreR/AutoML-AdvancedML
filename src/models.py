@@ -147,7 +147,7 @@ class KNNRegressor:
     def neighbour(self, rng: np.random.Generator):
         """
         Local neighborhood moves:
-          - with highest probability: k <- k +/- 1
+          - with highest probability: k local move (usually +/-1, sometimes larger jump)
           - sometimes: toggle weights
           - sometimes: toggle p (1 <-> 2)
         """
@@ -162,8 +162,13 @@ class KNNRegressor:
 
         if r < 0.70:
             # local move in k
-            step = rng.choice([-1, 1])
-            new_k = int(np.clip(new_k + step, k_min, k_max))
+            magnitude = int(rng.choice([1, 3, 5], p=[0.7, 0.2, 0.1]))
+            step = magnitude if rng.random() < 0.5 else -magnitude
+            candidate_k = int(np.clip(new_k + step, k_min, k_max))
+            # Avoid null proposals at bounds when possible.
+            if candidate_k == new_k and k_min < k_max:
+                candidate_k = int(np.clip(new_k - step, k_min, k_max))
+            new_k = candidate_k
 
         elif r < 0.85:
             # toggle weights
@@ -192,9 +197,9 @@ class RandomForestRegressorSA:
 
     def __init__(
         self,
-        n_estimators: int = 200,
-        max_depth: int | None = None,
-        min_samples_leaf: int = 1,
+        n_estimators: int = 100,
+        max_depth: int | None = 15,
+        min_samples_leaf: int = 2,
         max_features: str | float = "sqrt",   # "sqrt", "log2", or float in (0,1]
         n_estimators_bounds: tuple[int, int] = (50, 500),
         max_depth_bounds: tuple[int, int] = (2, 30),
@@ -283,12 +288,14 @@ class RandomForestRegressorSA:
 
         r = rng.random()
 
-        if r < 0.45:
+        # Bias toward parameters that usually change behavior more than
+        # n_estimators (which often affects variance/runtime more than split shape).
+        if r < 0.25:
             # n_estimators move
             step = int(rng.choice([-10, 10]))
             new_n_estimators = int(np.clip(new_n_estimators + step, ne_lo, ne_hi))
 
-        elif r < 0.75:
+        elif r < 0.65:
             # max_depth move (toggle None sometimes)
             if new_max_depth is None:
                 # come back from None to a reasonable depth
@@ -300,7 +307,7 @@ class RandomForestRegressorSA:
                     step = int(rng.choice([-1, 1]))
                     new_max_depth = int(np.clip(new_max_depth + step, md_lo, md_hi))
 
-        elif r < 0.90:
+        elif r < 0.85:
             # min_samples_leaf move
             step = int(rng.choice([-1, 1]))
             new_min_samples_leaf = int(np.clip(new_min_samples_leaf + step, msl_lo, msl_hi))
@@ -447,33 +454,37 @@ class MLP:
 
         r = rng.random()
 
-        if r < 0.55:
+        if r < 0.70:
             # tweak architecture
             arch = list(new_arch)
             lo_l, hi_l = self.bounds_layers
 
-            # with small prob, add/remove a layer (if allowed)
-            if rng.random() < 0.20 and (lo_l != hi_l):
+            # with moderate prob, add/remove a layer (if allowed)
+            if rng.random() < 0.35 and (lo_l != hi_l):
                 if len(arch) < hi_l and rng.random() < 0.5:
-                    arch.append(arch[-1] if arch else 64)
+                    insert_idx = int(rng.integers(0, len(arch) + 1)) if arch else 0
+                    seed_units = arch[insert_idx] if (arch and insert_idx < len(arch)) else (arch[-1] if arch else 64)
+                    arch.insert(insert_idx, seed_units)
                 elif len(arch) > lo_l:
-                    arch.pop()
+                    remove_idx = int(rng.integers(0, len(arch)))
+                    arch.pop(remove_idx)
 
             # tweak one layer width +/- step
             if len(arch) == 0:
                 arch = [64]
             idx = int(rng.integers(0, len(arch)))
-            step = int(rng.choice([-16, -8, 8, 16]))
+            magnitude = int(rng.choice([8, 16, 32], p=[0.45, 0.40, 0.15]))
+            step = magnitude if rng.random() < 0.5 else -magnitude
             arch[idx] = arch[idx] + step
 
             new_arch = self._clip_arch(tuple(arch))
 
-        elif r < 0.75:
+        elif r < 0.82:
             # alpha log move
             a = self._clip_pos(new_alpha, self.alpha_bounds)
             new_alpha = self._clip_pos(np.exp(np.log(a) + rng.normal(0.0, self.log_step_alpha)), self.alpha_bounds)
 
-        elif r < 0.95:
+        elif r < 0.90:
             # learning rate log move
             lr = self._clip_pos(new_lr, self.lr_bounds)
             new_lr = self._clip_pos(np.exp(np.log(lr) + rng.normal(0.0, self.log_step_lr)), self.lr_bounds)
