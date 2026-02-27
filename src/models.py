@@ -21,6 +21,8 @@ class RidgeRegressor:
         fit_intercept: bool = True,
         alpha_bounds: tuple[float, float] = (1e-8, 1e6),
         log_step: float = 0.35,      # smaller => more local
+        large_jump_prob: float = 0.20,
+        large_log_step: float = 1.30,
         use_scaler: bool = True,     # keep scaling inside the model class
         random_state: int | None = None,
     ):
@@ -28,6 +30,8 @@ class RidgeRegressor:
         self.fit_intercept = bool(fit_intercept)
         self.alpha_bounds = alpha_bounds
         self.log_step = float(log_step)
+        self.large_jump_prob = float(large_jump_prob)
+        self.large_log_step = float(large_log_step)
         self.use_scaler = bool(use_scaler)
         self.random_state = random_state
 
@@ -67,13 +71,15 @@ class RidgeRegressor:
     def neighbour(self, rng: np.random.Generator):
         """
         Local neighborhood move:
-          alpha' = alpha * exp(N(0, log_step))
+          Usually: alpha' = alpha * exp(N(0, log_step))
+          Occasionally: alpha' = alpha * exp(N(0, large_log_step))
         This is 'close' in multiplicative sense (good because alpha spans orders of magnitude).
         """
         lo, hi = self.alpha_bounds
         alpha_safe = min(max(self.alpha, lo), hi)
 
-        new_log_alpha = np.log(alpha_safe) + rng.normal(0.0, self.log_step)
+        step_scale = self.large_log_step if rng.random() < self.large_jump_prob else self.log_step
+        new_log_alpha = np.log(alpha_safe) + rng.normal(0.0, step_scale)
         new_alpha = float(np.clip(np.exp(new_log_alpha), lo, hi))
 
         # Usually keep intercept fixed; uncomment if you want occasional structure moves
@@ -162,7 +168,7 @@ class KNNRegressor:
 
         if r < 0.70:
             # local move in k
-            magnitude = int(rng.choice([1, 3, 5], p=[0.7, 0.2, 0.1]))
+            magnitude = int(rng.choice([1, 3, 5, 10, 20], p=[0.2, 0.3, 0.2, 0.2, 0.1]))
             step = magnitude if rng.random() < 0.5 else -magnitude
             candidate_k = int(np.clip(new_k + step, k_min, k_max))
             # Avoid null proposals at bounds when possible.

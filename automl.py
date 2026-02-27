@@ -153,7 +153,7 @@ def main(
     dataset_name: str,
     k_fold: int = 3,
     temperature: float = 0.05,
-    model_temperature_factor: float = 2.0,
+    model_temperature_factor: float = 4.0,
     p_change_model: float = 0.35,
     execution_time: float = 3600.0,
     min_temperature: float = 1e-4,
@@ -367,8 +367,8 @@ if __name__ == "__main__":
         "-m",
         "--model-temperature-factor",
         type=float,
-        default=2.0,
-        help="Positive factor (>0) to scale model-change exploration temperature (default: 2.0).",
+        default=4.0,
+        help="Positive factor (>0) to scale model-change exploration temperature (default: 4.0).",
     )
     parser.add_argument(
         "-p",
