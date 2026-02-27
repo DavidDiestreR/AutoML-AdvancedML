@@ -1,17 +1,17 @@
 {
-  "elapsed_time": 386.97521659999984,
+  "elapsed_time": 3674.6242042000013,
   "dataset_name": "StabIndex.csv",
   "target_col": "num__cosmic_stability_index",
   "test_size": 0.2,
   "k_fold": 3,
-  "execution_time": 300.0,
-  "max_time_mins": 5.0,
-  "seed": 1772200698,
+  "execution_time": 3600.0,
+  "max_time_mins": 60.0,
+  "seed": 1772202344,
   "metrics": {
-    "rmse": 0.35082732394177224,
-    "mse": 0.12307981122414519,
-    "mae": 0.2696600354688891,
-    "r2": 0.8761190204492665
+    "rmse": 0.3664055861451951,
+    "mse": 0.13425305355840397,
+    "mae": 0.27177588755482973,
+    "r2": 0.8723354400819419
   },
   "pipeline_export_mode": "repr_fallback",
   "pipeline_file": "C:\\Users\\david\\Desktop\\Uni\\AutoML-AdvancedML\\data\\results\\tpot\\StabIndex_best_pipeline.txt"

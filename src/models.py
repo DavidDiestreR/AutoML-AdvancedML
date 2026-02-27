@@ -1,13 +1,13 @@
 import numpy as np
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
-class RidgeRegressor:
+class PolynomialRegressorSA:
     """
-    Ridge regression with internal scaling + SA neighbor proposals.
+    Polynomial regression with optional regularization and SA neighbor proposals.
 
     API:
       - fit(X, y)
@@ -17,27 +17,65 @@ class RidgeRegressor:
 
     def __init__(
         self,
+        max_degree: int = 3,
+        degree_mask: tuple[int, ...] | None = None,  # bit i => use degree i+1 terms
+        regularization: str = "ridge",               # "none", "ridge", "lasso"
         alpha: float = 1.0,
         fit_intercept: bool = True,
+        degree_bounds: tuple[int, int] = (1, 6),
         alpha_bounds: tuple[float, float] = (1e-8, 1e6),
         log_step: float = 0.35,      # smaller => more local
         large_jump_prob: float = 0.20,
         large_log_step: float = 1.30,
+        lasso_max_iter: int = 3000,
+        lasso_tol: float = 1e-4,
         use_scaler: bool = True,     # keep scaling inside the model class
         random_state: int | None = None,
     ):
+        self.max_degree = int(max_degree)
+        self.degree_mask = tuple(int(x) for x in degree_mask) if degree_mask is not None else None
+        self.regularization = str(regularization).lower()
         self.alpha = float(alpha)
         self.fit_intercept = bool(fit_intercept)
+        self.degree_bounds = degree_bounds
         self.alpha_bounds = alpha_bounds
         self.log_step = float(log_step)
         self.large_jump_prob = float(large_jump_prob)
         self.large_log_step = float(large_log_step)
+        self.lasso_max_iter = int(lasso_max_iter)
+        self.lasso_tol = float(lasso_tol)
         self.use_scaler = bool(use_scaler)
         self.random_state = random_state
 
         # learned components after fit()
         self.scaler_ = None
+        self.poly_ = None
+        self.active_columns_ = None
+        self.effective_degree_mask_ = None
         self.model_ = None
+
+    @staticmethod
+    def _clip_alpha(alpha: float, bounds: tuple[float, float]) -> float:
+        lo, hi = bounds
+        return float(np.clip(alpha, lo, hi))
+
+    def _normalize_degree_mask(self, n_degrees: int) -> tuple[int, ...]:
+        if n_degrees < 1:
+            raise ValueError("n_degrees must be >= 1.")
+
+        if self.degree_mask is None:
+            mask = [1] * n_degrees
+        else:
+            mask = [1 if int(v) != 0 else 0 for v in self.degree_mask]
+            if len(mask) < n_degrees:
+                mask = mask + [1] * (n_degrees - len(mask))
+            else:
+                mask = mask[:n_degrees]
+
+        if sum(mask) == 0:
+            mask[0] = 1
+
+        return tuple(mask)
 
     def fit(self, X, y):
         X = np.asarray(X)
@@ -50,12 +88,45 @@ class RidgeRegressor:
             self.scaler_ = None
             Xs = X
 
-        self.model_ = Ridge(
-            alpha=self.alpha,
-            fit_intercept=self.fit_intercept,
-            random_state=self.random_state,
+        deg_lo, deg_hi = self.degree_bounds
+        effective_degree = int(np.clip(self.max_degree, deg_lo, deg_hi))
+        self.effective_degree_mask_ = self._normalize_degree_mask(effective_degree)
+
+        self.poly_ = PolynomialFeatures(
+            degree=effective_degree,
+            include_bias=False,
         )
-        self.model_.fit(Xs, y)
+        X_poly = self.poly_.fit_transform(Xs)
+        term_degrees = self.poly_.powers_.sum(axis=1)
+
+        active_degrees = {
+            deg for deg, bit in enumerate(self.effective_degree_mask_, start=1) if bit == 1
+        }
+        self.active_columns_ = np.isin(term_degrees, list(active_degrees))
+        X_selected = X_poly[:, self.active_columns_]
+
+        reg = self.regularization
+        alpha = self._clip_alpha(self.alpha, self.alpha_bounds)
+        if reg == "none":
+            self.model_ = LinearRegression(fit_intercept=self.fit_intercept)
+        elif reg == "ridge":
+            self.model_ = Ridge(
+                alpha=alpha,
+                fit_intercept=self.fit_intercept,
+                random_state=self.random_state,
+            )
+        elif reg == "lasso":
+            self.model_ = Lasso(
+                alpha=alpha,
+                fit_intercept=self.fit_intercept,
+                max_iter=self.lasso_max_iter,
+                tol=self.lasso_tol,
+                random_state=self.random_state,
+            )
+        else:
+            raise ValueError("regularization must be one of: 'none', 'ridge', 'lasso'.")
+
+        self.model_.fit(X_selected, y)
         return self
 
     def predict(self, X):
@@ -66,28 +137,62 @@ class RidgeRegressor:
         if self.scaler_ is not None:
             X = self.scaler_.transform(X)
 
-        return self.model_.predict(X)
+        X_poly = self.poly_.transform(X)
+        X_selected = X_poly[:, self.active_columns_]
+        return self.model_.predict(X_selected)
 
     def neighbour(self, rng: np.random.Generator):
         """
-        Local neighborhood move:
-          Usually: alpha' = alpha * exp(N(0, log_step))
-          Occasionally: alpha' = alpha * exp(N(0, large_log_step))
-        This is 'close' in multiplicative sense (good because alpha spans orders of magnitude).
+        Local neighborhood moves:
+          - Most often: flip one degree bit (0 <-> 1)
+          - Sometimes: switch regularization among {"none","ridge","lasso"}
+          - Sometimes: alpha log move
+          - Rarely: move max_degree by +/-1
         """
-        lo, hi = self.alpha_bounds
-        alpha_safe = min(max(self.alpha, lo), hi)
+        deg_lo, deg_hi = self.degree_bounds
+        current_degree = int(np.clip(self.max_degree, deg_lo, deg_hi))
+        mask = list(self._normalize_degree_mask(current_degree))
 
-        step_scale = self.large_log_step if rng.random() < self.large_jump_prob else self.log_step
-        new_log_alpha = np.log(alpha_safe) + rng.normal(0.0, step_scale)
-        new_alpha = float(np.clip(np.exp(new_log_alpha), lo, hi))
+        new_degree = current_degree
+        new_mask = mask.copy()
+        new_regularization = self.regularization
+        new_alpha = self.alpha
 
-        # Usually keep intercept fixed; uncomment if you want occasional structure moves
-        new_fit_intercept = self.fit_intercept
-        # if rng.random() < 0.03:
-        #     new_fit_intercept = not new_fit_intercept
+        r = rng.random()
+        if r < 0.60:
+            idx = int(rng.integers(0, len(new_mask)))
+            new_mask[idx] = 1 - new_mask[idx]
+            if sum(new_mask) == 0:
+                new_mask[idx] = 1
 
-        return {"alpha": new_alpha}
+        elif r < 0.75:
+            choices = ["none", "ridge", "lasso"]
+            choices = [c for c in choices if c != new_regularization]
+            new_regularization = choices[int(rng.integers(0, len(choices)))]
+
+        elif r < 0.90:
+            lo, hi = self.alpha_bounds
+            alpha_safe = min(max(self.alpha, lo), hi)
+            step_scale = self.large_log_step if rng.random() < self.large_jump_prob else self.log_step
+            new_log_alpha = np.log(alpha_safe) + rng.normal(0.0, step_scale)
+            new_alpha = float(np.clip(np.exp(new_log_alpha), lo, hi))
+
+        else:
+            step = -1 if rng.random() < 0.5 else 1
+            new_degree = int(np.clip(current_degree + step, deg_lo, deg_hi))
+            if new_degree > len(new_mask):
+                new_mask = new_mask + [1] * (new_degree - len(new_mask))
+            elif new_degree < len(new_mask):
+                new_mask = new_mask[:new_degree]
+                if sum(new_mask) == 0:
+                    new_mask[0] = 1
+
+        return {
+            "max_degree": int(new_degree),
+            "degree_mask": tuple(int(v) for v in new_mask),
+            "regularization": new_regularization,
+            "alpha": float(new_alpha),
+        }
 
 class KNNRegressor:
     """
@@ -101,13 +206,13 @@ class KNNRegressor:
 
     def __init__(
         self,
-        n_neighbors: int = 5,
+        n_neighbors: int | None = None,
         weights: str = "uniform",   # "uniform" or "distance"
         p: int = 2,                 # 1 (Manhattan) or 2 (Euclidean)
         k_bounds: tuple[int, int] = (1, 100),
         use_scaler: bool = True,
     ):
-        self.n_neighbors = int(n_neighbors)
+        self.n_neighbors = None if n_neighbors is None else int(n_neighbors)
         self.weights = str(weights)
         self.p = int(p)
         self.k_bounds = k_bounds
@@ -127,9 +232,16 @@ class KNNRegressor:
             self.scaler_ = None
             Xs = X
 
-        # clip k just in case
-        k_min, k_max = self.k_bounds
-        k = int(np.clip(self.n_neighbors, k_min, k_max))
+        # k upper bound is always the training subset size (CV-fold aware).
+        k_min, _ = self.k_bounds
+        n_samples = int(Xs.shape[0])
+        dynamic_k_max = max(k_min, n_samples)
+        if self.n_neighbors is None:
+            # Auto-init k at 5% of available samples.
+            base_k = int(round(0.05 * n_samples))
+        else:
+            base_k = int(self.n_neighbors)
+        k = int(np.clip(base_k, k_min, dynamic_k_max))
 
         self.model_ = KNeighborsRegressor(
             n_neighbors=k,
@@ -153,11 +265,12 @@ class KNNRegressor:
     def neighbour(self, rng: np.random.Generator):
         """
         Local neighborhood moves:
-          - with highest probability: k local move (usually +/-1, sometimes larger jump)
+          - with highest probability: k move with step size proportional to data size
           - sometimes: toggle weights
           - sometimes: toggle p (1 <-> 2)
         """
         k_min, k_max = self.k_bounds
+        k_scale = int(max(k_min, k_max))
 
         # Decide which hyperparameter to perturb (biased towards k)
         r = rng.random()
@@ -166,14 +279,19 @@ class KNNRegressor:
         new_weights = self.weights
         new_p = self.p
 
+        if new_k is None:
+            new_k = max(k_min, int(round(0.05 * k_scale)))
+
         if r < 0.70:
-            # local move in k
-            magnitude = int(rng.choice([1, 3, 5, 10, 20], p=[0.2, 0.3, 0.2, 0.2, 0.1]))
+            # proportional move in k based on the expected data size scale
+            base_step = max(1, int(round(0.01 * k_scale)))
+            step_options = [base_step, 2 * base_step, 5 * base_step, 10 * base_step]
+            magnitude = int(rng.choice(step_options, p=[0.45, 0.30, 0.20, 0.05]))
             step = magnitude if rng.random() < 0.5 else -magnitude
-            candidate_k = int(np.clip(new_k + step, k_min, k_max))
-            # Avoid null proposals at bounds when possible.
-            if candidate_k == new_k and k_min < k_max:
-                candidate_k = int(np.clip(new_k - step, k_min, k_max))
+            candidate_k = int(max(k_min, new_k + step))
+            # Avoid null proposals at lower bound when possible.
+            if candidate_k == new_k and new_k > k_min:
+                candidate_k = int(max(k_min, new_k - step))
             new_k = candidate_k
 
         elif r < 0.85:

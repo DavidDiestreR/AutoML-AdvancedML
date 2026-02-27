@@ -39,7 +39,7 @@ def _json_default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def _default_init_params(model_cls) -> dict:
+def _default_init_params(model_cls, n_samples: int | None = None) -> dict:
     """Return only mutable default params (the keys produced by neighbour())."""
     defaults = {}
     signature = inspect.signature(model_cls.__init__)
@@ -51,7 +51,18 @@ def _default_init_params(model_cls) -> dict:
     probe = model.neighbour(np.random.default_rng(0))
     if not isinstance(probe, dict):
         raise TypeError(f"{model_cls.__name__}.neighbour(...) must return a dict.")
-    return {key: copy.deepcopy(defaults[key]) for key in probe.keys()}
+    init_params = {}
+    for key, proposed_value in probe.items():
+        default_value = defaults[key]
+        # If default is None (e.g., adaptive init params), seed with neighbour proposal.
+        init_params[key] = copy.deepcopy(proposed_value) if default_value is None else copy.deepcopy(default_value)
+
+    if model_cls is models.KNNRegressor and n_samples is not None:
+        k_min = int(defaults.get("k_bounds", (1, 100))[0])
+        k_init = max(k_min, int(round(0.05 * int(n_samples))))
+        init_params["n_neighbors"] = int(k_init)
+
+    return init_params
 
 
 def _load_processed_dataset(data_path: Path, dataset_name: str):
@@ -102,6 +113,7 @@ def _generate_neighboring_state(
     current_iteration_row: dict[str, dict[str, object]],
     p_change_model: float,
     rng: np.random.Generator,
+    proposal_n_samples: int | None = None,
 ) -> dict[str, object]:
     """
     Propose a neighboring state:
@@ -111,7 +123,7 @@ def _generate_neighboring_state(
     Returns: {"model": <model_name>, "params": <dict>}
     """
     model_class_map = {
-        "ridge": models.RidgeRegressor,
+        "polynomial": models.PolynomialRegressorSA,
         "knn": models.KNNRegressor,
         "randomforest": models.RandomForestRegressorSA,
         "mlp": models.MLP,
@@ -144,7 +156,13 @@ def _generate_neighboring_state(
 
     # Hyperparameter proposal: keep the current model and perturb its params locally.
     base_params = copy.deepcopy(current_model_params)
-    model_instance = model_class_map[current_model](**copy.deepcopy(base_params))
+    if current_model == "knn" and proposal_n_samples is not None:
+        model_instance = model_class_map[current_model](
+            **copy.deepcopy(base_params),
+            k_bounds=(1, int(max(1, proposal_n_samples))),
+        )
+    else:
+        model_instance = model_class_map[current_model](**copy.deepcopy(base_params))
     neighbor_update = model_instance.neighbour(rng)
 
     new_params = copy.deepcopy(base_params)
@@ -197,7 +215,7 @@ def main(
     cv = KFold(n_splits=k_fold, shuffle=True, random_state=seed)
 
     model_map = {
-        "ridge": models.RidgeRegressor,
+        "polynomial": models.PolynomialRegressorSA,
         "knn": models.KNNRegressor,
         "randomforest": models.RandomForestRegressorSA,
         "mlp": models.MLP,
@@ -207,7 +225,7 @@ def main(
     # time step (int) -> model name (str) ->
     # {"params": dict, "rmse": float, "current_model": bool}
     for model_name, model_cls in model_map.items():
-        default_params = _default_init_params(model_cls)
+        default_params = _default_init_params(model_cls, n_samples=int(X_train.shape[0]))
         rmse = cross_validate_regression_model(
             model_name=model_name,
             cv=cv,
@@ -239,6 +257,7 @@ def main(
             current_iteration_row=current_row,
             p_change_model=p_change_model,
             rng=rng,
+            proposal_n_samples=int(X_train.shape[0]),
         )
         proposed_model = str(proposed_state["model"])
         proposed_params = copy.deepcopy(proposed_state["params"])

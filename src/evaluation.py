@@ -25,7 +25,7 @@ def cross_validate_regression_model(
     normalized_name = model_name.strip().lower()
     params = dict(model_params or {})
     model_map = {
-        "ridge": models.RidgeRegressor,
+        "polynomial": models.PolynomialRegressorSA,
         "knn": models.KNNRegressor,
         "randomforest": models.RandomForestRegressorSA,
         "mlp": models.MLP,
@@ -68,7 +68,7 @@ def cross_validate_regression_metrics(
     normalized_name = model_name.strip().lower()
     params = dict(model_params or {})
     model_map = {
-        "ridge": models.RidgeRegressor,
+        "polynomial": models.PolynomialRegressorSA,
         "knn": models.KNNRegressor,
         "randomforest": models.RandomForestRegressorSA,
         "mlp": models.MLP,
