@@ -1,0 +1,21 @@
+{
+  "elapsed_time": 3613.1650156999995,
+  "num_iter": 3706,
+  "best_model": "polynomial",
+  "params": {
+    "max_degree": 2,
+    "degree_mask": [
+      1,
+      1
+    ],
+    "regularization": "lasso",
+    "alpha": 0.005281308622576793
+  },
+  "rmse": 0.3313983300873127,
+  "metrics": {
+    "rmse": 0.3313983300873127,
+    "mse": 0.10983298633396248,
+    "mae": 0.25814936416869383,
+    "r2": 0.8896531019062245
+  }
+}

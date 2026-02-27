@@ -1,20 +1,19 @@
 {
-  "elapsed_time": 33.38713503600002,
+  "elapsed_time": 123.10572104699997,
   "dataset_name": "ChocolateSales.csv",
   "target_col": "num__sales",
   "test_size": 0.2,
-  "k_fold": 5,
-  "execution_time": 30.0,
+  "k_fold": 3,
+  "execution_time": 120.0,
   "per_run_time_limit": 30,
-  "seed": 42,
+  "memory_limit_mb": 8192,
+  "seed": 1772216768,
   "verbosity_arg_kept_for_cli_compat": 2,
-  "n_jobs": 16,
+  "n_jobs": 1,
   "metrics": {
-    "rmse": 0.16792742942686578,
-    "mse": 0.028199621553914984,
-    "mae": 0.09158302211040084,
-    "r2": 0.9738884491024119
-  },
-  "show_models_file": "/mnt/c/Users/roset/OneDrive/AUTOML-ADVANCEDML/data/results/autosklearn/ChocolateSales_show_models.txt",
-  "statistics_file": "/mnt/c/Users/roset/OneDrive/AUTOML-ADVANCEDML/data/results/autosklearn/ChocolateSales_statistics.txt"
+    "rmse": 0.046096704010150064,
+    "mse": 0.0021249061205993853,
+    "mae": 0.03689640149559677,
+    "r2": 0.9979192253922358
+  }
 }

@@ -1,0 +1,16 @@
+{
+  "elapsed_time": 139.0965488999991,
+  "dataset_name": "ChocolateSales.csv",
+  "target_col": "num__sales",
+  "test_size": 0.2,
+  "k_fold": 3,
+  "execution_time": 120.0,
+  "max_time_mins": 2.0,
+  "seed": 1772217045,
+  "metrics": {
+    "rmse": 0.04096219866750032,
+    "mse": 0.001677901719675765,
+    "mae": 0.0313495376287545,
+    "r2": 0.9978038737456862
+  }
+}

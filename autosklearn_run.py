@@ -3,8 +3,6 @@
 Loads a processed CSV dataset, runs AutoSklearnRegressor with a time budget,
 evaluates test RMSE on a hold-out split, and writes artifacts to
 `data/results/autosklearn/`.
-
-Designed to mirror the structure and outputs of `tpot_run.py` for fair comparison.
 """
 
 from __future__ import annotations
@@ -31,79 +29,52 @@ def _json_default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def _format_best_model(automl) -> str:
-    """Format best model with explicit component names and parameters (without ID)."""
-    def _config_to_dict(config_obj):
-        if config_obj is None:
-            return None
-        if isinstance(config_obj, dict):
-            return config_obj
-        get_dictionary = getattr(config_obj, "get_dictionary", None)
-        if callable(get_dictionary):
-            try:
-                return get_dictionary()
-            except Exception:
-                return None
+def _config_to_dict(config_obj):
+    if config_obj is None:
         return None
+    if isinstance(config_obj, dict):
+        return config_obj
+    get_dictionary = getattr(config_obj, "get_dictionary", None)
+    if callable(get_dictionary):
+        try:
+            return get_dictionary()
+        except Exception:
+            return None
+    return None
 
-    def _select_params(cfg: dict, prefix: str):
-        out = {}
-        plen = len(prefix)
-        for key, value in cfg.items():
-            if key.startswith(prefix):
-                out[key[plen:]] = value
-        return out
 
-    def _format_section(title: str, name: str | None, params: dict):
-        lines = [f"{title}={name or 'unknown'}("]
-        if params:
-            for key in sorted(params):
-                lines.append(f"  {key}={params[key]!r}")
-        lines.append(")")
-        return "\n".join(lines)
-
+def _format_pipeline_artifact(automl) -> str:
+    """Human-readable artifact similar to TPOT best pipeline dumps."""
+    lines = ["Auto-sklearn selected pipeline(s):"]
     try:
         models_with_weights = automl.get_models_with_weights()
+        lines.append(f"Ensemble size: {len(models_with_weights)}")
+        for idx, (weight, model) in enumerate(models_with_weights, start=1):
+            lines.append("")
+            lines.append(f"Pipeline #{idx}")
+            lines.append(f"weight: {float(weight):.6f}")
+
+            cfg = _config_to_dict(getattr(model, "config", None))
+            if cfg is None:
+                cfg = _config_to_dict(getattr(getattr(model, "choice", None), "config", None))
+
+            if isinstance(cfg, dict) and cfg:
+                lines.append("config:")
+                lines.append(pformat(cfg, sort_dicts=True, width=100, compact=False))
+            else:
+                lines.append("model_repr:")
+                lines.append(repr(model))
+        return "\n".join(lines)
     except Exception:
-        models_with_weights = None
+        pass
 
-    if models_with_weights:
-        # Best = highest ensemble weight.
-        best_weight, best_model = max(models_with_weights, key=lambda item: float(item[0]))
-
-        # Prefer structured config extraction for a readable, pipeline-like text.
-        cfg = _config_to_dict(getattr(best_model, "config", None))
-        if cfg is None:
-            cfg = _config_to_dict(getattr(getattr(best_model, "choice", None), "config", None))
-
-        if isinstance(cfg, dict) and cfg:
-            reg_name = cfg.get("regressor:__choice__")
-            feat_name = cfg.get("feature_preprocessor:__choice__")
-            data_name = cfg.get("data_preprocessor:__choice__")
-
-            reg_params = _select_params(cfg, f"regressor:{reg_name}:") if reg_name else {}
-            feat_params = (
-                _select_params(cfg, f"feature_preprocessor:{feat_name}:") if feat_name else {}
-            )
-            data_params = _select_params(cfg, "data_preprocessor:")
-            data_params.pop("__choice__", None)
-
-            lines = ["Best model used (no ID):", "Pipeline("]
-            lines.append("  " + _format_section("data_preprocessor", data_name, data_params).replace("\n", "\n  "))
-            lines.append("  " + _format_section("feature_preprocessor", feat_name, feat_params).replace("\n", "\n  "))
-            lines.append("  " + _format_section("regressor", reg_name, reg_params).replace("\n", "\n  "))
-            lines.append(")")
-            lines.append(f"ensemble_weight={best_weight}")
-            return "\n".join(lines)
-
-        # Fallback: repr of best model if no config dictionary available.
-        return f"Best model used (no ID):\n{repr(best_model)}\n\nensemble_weight={best_weight}"
-
-    # Fallback if extraction fails.
     try:
-        return f"Best model used (raw show_models fallback):\n{automl.show_models()}"
+        lines.append("")
+        lines.append("raw_show_models:")
+        lines.append(str(automl.show_models()))
     except Exception as exc:
-        return f"Could not extract best model: {type(exc).__name__}: {exc}"
+        lines.append(f"show_models() failed: {type(exc).__name__}: {exc}")
+    return "\n".join(lines)
 
 
 def _load_processed_dataset(data_path: Path, dataset_name: str):
@@ -131,6 +102,7 @@ def _build_autosklearn_regressor(
     k_fold: int,
     seed: int,
     n_jobs: int,
+    memory_limit_mb: int,
 ):
     """Build AutoSklearnRegressor with a sensible per-run limit and CV resampling."""
     try:
@@ -150,6 +122,7 @@ def _build_autosklearn_regressor(
         per_run_time_limit=per_run_time_limit,
         seed=seed,
         n_jobs=n_jobs,
+        memory_limit=int(memory_limit_mb),
         # Match a "k-fold CV during search" style comparison
         resampling_strategy="cv",
         resampling_strategy_arguments={"folds": int(k_fold)},
@@ -165,6 +138,8 @@ def main(
     k_fold: int = 3,
     execution_time: float = 3600.0,
     seed: int | None = None,
+    n_jobs: int | None = None,
+    memory_limit_mb: int = 8192,
     verbosity: int = 2,  # kept for CLI compatibility with tpot_run.py
 ) -> None:
     if not dataset_name or not str(dataset_name).strip():
@@ -189,12 +164,13 @@ def main(
         X, y, test_size=test_size, random_state=seed
     )
 
-    fixed_n_jobs = max(1, int(os.cpu_count() or 1))
+    fixed_n_jobs = max(1, int(n_jobs if n_jobs is not None else 1))
     automl, per_run_time_limit = _build_autosklearn_regressor(
         execution_time=execution_time,
         k_fold=k_fold,
         seed=seed,
         n_jobs=fixed_n_jobs,
+        memory_limit_mb=memory_limit_mb,
     )
 
     # auto-sklearn expects numeric matrices; your processed CSV should already be numeric.
@@ -210,15 +186,13 @@ def main(
 
     # Prepare outputs (mirror tpot_run.py style)
     summary_file = results_path / f"{dataset_file.stem}_run_summary.json"
-    models_txt_file = results_path / f"{dataset_file.stem}_show_models.txt"
+    models_txt_file = results_path / f"{dataset_file.stem}_best_pipeline.txt"
     stats_txt_file = results_path / f"{dataset_file.stem}_statistics.txt"
 
 
     # These are great for your report (they show what it found / ensemble)
     try:
-        models_txt_file.write_text(
-            _format_best_model(automl) + "\n", encoding="utf-8"
-        )
+        models_txt_file.write_text(_format_pipeline_artifact(automl) + "\n", encoding="utf-8")
     except Exception as exc:
         models_txt_file.write_text(
             f"show_models() failed: {type(exc).__name__}: {exc}\n", encoding="utf-8"
@@ -229,7 +203,6 @@ def main(
         stats_txt_file.write_text(
             f"sprint_statistics() failed: {type(exc).__name__}: {exc}\n", encoding="utf-8"
         )
-
     run_summary = {
         "elapsed_time": elapsed_seconds,
         "dataset_name": dataset_file.name,
@@ -238,6 +211,7 @@ def main(
         "k_fold": k_fold,
         "execution_time": execution_time,
         "per_run_time_limit": per_run_time_limit,
+        "memory_limit_mb": int(memory_limit_mb),
         "seed": seed,
         "verbosity_arg_kept_for_cli_compat": verbosity,
         "n_jobs": fixed_n_jobs,
@@ -247,8 +221,6 @@ def main(
             "mae": mae,
             "r2": r2,
         },
-        "show_models_file": str(models_txt_file),
-        "statistics_file": str(stats_txt_file),
     }
 
     with summary_file.open("w", encoding="utf-8") as f:
@@ -265,11 +237,12 @@ def main(
         f" k_fold: {k_fold}\n"
         f" execution_time: {execution_time}\n"
         f" per_run_time_limit: {per_run_time_limit}\n"
+        f" memory_limit_mb: {memory_limit_mb}\n"
         f" test_size: {test_size}\n"
         f" seed: {seed}\n"
-        f" n_jobs: {fixed_n_jobs} (fixed to cpu_count)\n"
+        f" n_jobs: {fixed_n_jobs}\n"
         f" run_summary_file: {summary_file}\n"
-        f" show_models_file: {models_txt_file}\n"
+        f" best_pipeline_file: {models_txt_file}\n"
         f" statistics_file: {stats_txt_file}\n"
         f" run_summary:\n{pformat(run_summary, sort_dicts=False)}"
     )
@@ -318,6 +291,18 @@ if __name__ == "__main__":
         default=2,
         help="Kept for CLI compatibility with tpot_run.py (auto-sklearn ignores it).",
     )
+    parser.add_argument(
+        "--n-jobs",
+        type=int,
+        default=1,
+        help="Parallel jobs for auto-sklearn (default: 1, safer for memory).",
+    )
+    parser.add_argument(
+        "--memory-limit-mb",
+        type=int,
+        default=8192,
+        help="Per-model memory limit in MB (default: 8192).",
+    )
     args = parser.parse_args()
     main(
         dataset_name=args.dataset_name,
@@ -325,5 +310,7 @@ if __name__ == "__main__":
         k_fold=args.k_fold,
         execution_time=args.execution_time,
         seed=args.seed,
+        n_jobs=args.n_jobs,
+        memory_limit_mb=args.memory_limit_mb,
         verbosity=args.verbosity,
     )

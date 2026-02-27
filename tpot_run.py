@@ -160,23 +160,15 @@ def main(
     with summary_file.open("w", encoding="utf-8") as f:
         json.dump(run_summary, f, indent=2, default=_json_default)
 
-    pipeline_export_mode = "none"
     exported_pipeline_path = None
     if hasattr(tpot, "export"):
         tpot.export(str(pipeline_file))
-        pipeline_export_mode = "python_export"
         exported_pipeline_path = str(pipeline_file)
     else:
         fitted_pipeline = getattr(tpot, "fitted_pipeline_", None)
         pipeline_repr = repr(fitted_pipeline) if fitted_pipeline is not None else "None"
         pipeline_fallback_file.write_text(pipeline_repr + "\n", encoding="utf-8")
-        pipeline_export_mode = "repr_fallback"
         exported_pipeline_path = str(pipeline_fallback_file)
-
-    run_summary["pipeline_export_mode"] = pipeline_export_mode
-    run_summary["pipeline_file"] = exported_pipeline_path
-    with summary_file.open("w", encoding="utf-8") as f:
-        json.dump(run_summary, f, indent=2, default=_json_default)
 
     print(
         "TPOT run finished.\n"

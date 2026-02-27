@@ -237,8 +237,8 @@ class KNNRegressor:
         n_samples = int(Xs.shape[0])
         dynamic_k_max = max(k_min, n_samples)
         if self.n_neighbors is None:
-            # Auto-init k at 5% of available samples.
-            base_k = int(round(0.05 * n_samples))
+            # Auto-init k at 2% of available samples.
+            base_k = int(round(0.02 * n_samples))
         else:
             base_k = int(self.n_neighbors)
         k = int(np.clip(base_k, k_min, dynamic_k_max))
@@ -280,7 +280,7 @@ class KNNRegressor:
         new_p = self.p
 
         if new_k is None:
-            new_k = max(k_min, int(round(0.05 * k_scale)))
+            new_k = max(k_min, int(round(0.02 * k_scale)))
 
         if r < 0.70:
             # proportional move in k based on the expected data size scale

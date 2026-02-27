@@ -12,7 +12,5 @@
     "mse": 0.13425305355840397,
     "mae": 0.27177588755482973,
     "r2": 0.8723354400819419
-  },
-  "pipeline_export_mode": "repr_fallback",
-  "pipeline_file": "C:\\Users\\david\\Desktop\\Uni\\AutoML-AdvancedML\\data\\results\\tpot\\StabIndex_best_pipeline.txt"
+  }
 }

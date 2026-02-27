@@ -59,7 +59,7 @@ def _default_init_params(model_cls, n_samples: int | None = None) -> dict:
 
     if model_cls is models.KNNRegressor and n_samples is not None:
         k_min = int(defaults.get("k_bounds", (1, 100))[0])
-        k_init = max(k_min, int(round(0.05 * int(n_samples))))
+        k_init = max(k_min, int(round(0.02 * int(n_samples))))
         init_params["n_neighbors"] = int(k_init)
 
     return init_params
