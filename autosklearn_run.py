@@ -31,6 +31,81 @@ def _json_default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
+def _format_best_model(automl) -> str:
+    """Format best model with explicit component names and parameters (without ID)."""
+    def _config_to_dict(config_obj):
+        if config_obj is None:
+            return None
+        if isinstance(config_obj, dict):
+            return config_obj
+        get_dictionary = getattr(config_obj, "get_dictionary", None)
+        if callable(get_dictionary):
+            try:
+                return get_dictionary()
+            except Exception:
+                return None
+        return None
+
+    def _select_params(cfg: dict, prefix: str):
+        out = {}
+        plen = len(prefix)
+        for key, value in cfg.items():
+            if key.startswith(prefix):
+                out[key[plen:]] = value
+        return out
+
+    def _format_section(title: str, name: str | None, params: dict):
+        lines = [f"{title}={name or 'unknown'}("]
+        if params:
+            for key in sorted(params):
+                lines.append(f"  {key}={params[key]!r}")
+        lines.append(")")
+        return "\n".join(lines)
+
+    try:
+        models_with_weights = automl.get_models_with_weights()
+    except Exception:
+        models_with_weights = None
+
+    if models_with_weights:
+        # Best = highest ensemble weight.
+        best_weight, best_model = max(models_with_weights, key=lambda item: float(item[0]))
+
+        # Prefer structured config extraction for a readable, pipeline-like text.
+        cfg = _config_to_dict(getattr(best_model, "config", None))
+        if cfg is None:
+            cfg = _config_to_dict(getattr(getattr(best_model, "choice", None), "config", None))
+
+        if isinstance(cfg, dict) and cfg:
+            reg_name = cfg.get("regressor:__choice__")
+            feat_name = cfg.get("feature_preprocessor:__choice__")
+            data_name = cfg.get("data_preprocessor:__choice__")
+
+            reg_params = _select_params(cfg, f"regressor:{reg_name}:") if reg_name else {}
+            feat_params = (
+                _select_params(cfg, f"feature_preprocessor:{feat_name}:") if feat_name else {}
+            )
+            data_params = _select_params(cfg, "data_preprocessor:")
+            data_params.pop("__choice__", None)
+
+            lines = ["Best model used (no ID):", "Pipeline("]
+            lines.append("  " + _format_section("data_preprocessor", data_name, data_params).replace("\n", "\n  "))
+            lines.append("  " + _format_section("feature_preprocessor", feat_name, feat_params).replace("\n", "\n  "))
+            lines.append("  " + _format_section("regressor", reg_name, reg_params).replace("\n", "\n  "))
+            lines.append(")")
+            lines.append(f"ensemble_weight={best_weight}")
+            return "\n".join(lines)
+
+        # Fallback: repr of best model if no config dictionary available.
+        return f"Best model used (no ID):\n{repr(best_model)}\n\nensemble_weight={best_weight}"
+
+    # Fallback if extraction fails.
+    try:
+        return f"Best model used (raw show_models fallback):\n{automl.show_models()}"
+    except Exception as exc:
+        return f"Could not extract best model: {type(exc).__name__}: {exc}"
+
+
 def _load_processed_dataset(data_path: Path, dataset_name: str):
     """Load a processed CSV dataset and split it into X/y."""
     dataset_file = data_path / dataset_name
@@ -87,7 +162,7 @@ def _build_autosklearn_regressor(
 def main(
     dataset_name: str,
     test_size: float = 0.2,
-    k_fold: int = 5,
+    k_fold: int = 3,
     execution_time: float = 3600.0,
     seed: int | None = None,
     verbosity: int = 2,  # kept for CLI compatibility with tpot_run.py
@@ -137,12 +212,13 @@ def main(
     summary_file = results_path / f"{dataset_file.stem}_run_summary.json"
     models_txt_file = results_path / f"{dataset_file.stem}_show_models.txt"
     stats_txt_file = results_path / f"{dataset_file.stem}_statistics.txt"
-    preds_file = results_path / f"{dataset_file.stem}_test_predictions.csv"
 
 
     # These are great for your report (they show what it found / ensemble)
     try:
-        models_txt_file.write_text(str(automl.show_models()) + "\n", encoding="utf-8")
+        models_txt_file.write_text(
+            _format_best_model(automl) + "\n", encoding="utf-8"
+        )
     except Exception as exc:
         models_txt_file.write_text(
             f"show_models() failed: {type(exc).__name__}: {exc}\n", encoding="utf-8"
@@ -153,11 +229,6 @@ def main(
         stats_txt_file.write_text(
             f"sprint_statistics() failed: {type(exc).__name__}: {exc}\n", encoding="utf-8"
         )
-
-    # Save test predictions for later plotting/analysis
-    pd.DataFrame({"y_true": y_test.values, "y_pred": np.asarray(y_pred)}).to_csv(
-        preds_file, index=False
-    )
 
     run_summary = {
         "elapsed_time": elapsed_seconds,
@@ -178,7 +249,6 @@ def main(
         },
         "show_models_file": str(models_txt_file),
         "statistics_file": str(stats_txt_file),
-        "predictions_file": str(preds_file),
     }
 
     with summary_file.open("w", encoding="utf-8") as f:
@@ -201,7 +271,6 @@ def main(
         f" run_summary_file: {summary_file}\n"
         f" show_models_file: {models_txt_file}\n"
         f" statistics_file: {stats_txt_file}\n"
-        f" predictions_file: {preds_file}\n"
         f" run_summary:\n{pformat(run_summary, sort_dicts=False)}"
     )
 

@@ -1,0 +1,25 @@
+Best model used (no ID):
+Pipeline(
+  data_preprocessor=feature_type(
+    feature_type:numerical_transformer:imputation:strategy='median'
+    feature_type:numerical_transformer:rescaling:__choice__='minmax'
+  )
+  feature_preprocessor=feature_agglomeration(
+    affinity='euclidean'
+    linkage='average'
+    n_clusters=272
+    pooling_func='median'
+  )
+  regressor=extra_trees(
+    bootstrap='False'
+    criterion='mse'
+    max_depth='None'
+    max_features=0.5120356089629183
+    max_leaf_nodes='None'
+    min_impurity_decrease=0.0
+    min_samples_leaf=1
+    min_samples_split=4
+    min_weight_fraction_leaf=0.0
+  )
+)
+ensemble_weight=0.56
