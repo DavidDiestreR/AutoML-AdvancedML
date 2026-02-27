@@ -24,7 +24,10 @@ import pandas as pd
 from sklearn.model_selection import KFold
 
 from src import models
-from src.evaluation import cross_validate_regression_model
+from src.evaluation import (
+    cross_validate_regression_metrics,
+    cross_validate_regression_model,
+)
 
 
 def _json_default(obj):
@@ -301,12 +304,21 @@ def main(
     )
     elapsed_seconds = time.perf_counter() - init_start_time
 
+    best_metrics = cross_validate_regression_metrics(
+        model_name=best_model_name,
+        cv=cv,
+        X_train=X_train,
+        y_train=y_train,
+        model_params=best_model_state["params"],
+    )
+
     run_summary = {
         "elapsed_time": elapsed_seconds,
         "num_iter": int(last_iteration),
         "best_model": best_model_name,
         "params": best_model_state["params"],
-        "rmse": best_model_state["rmse"],
+        "rmse": best_metrics["rmse"],
+        "metrics": best_metrics,
     }
 
     state_matrix_file = results_path / f"{dataset_file.stem}_state_matrix.json"

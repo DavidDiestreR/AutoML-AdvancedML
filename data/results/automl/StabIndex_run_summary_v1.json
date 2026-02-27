@@ -1,0 +1,16 @@
+{
+  "elapsed_time": 3606.2063305,
+  "num_iter": 1077,
+  "best_model": "mlp",
+  "params": {
+    "hidden_layer_sizes": [
+      224,
+      240,
+      224
+    ],
+    "activation": "relu",
+    "alpha": 5.700325715527988e-05,
+    "learning_rate_init": 0.008301071071690645
+  },
+  "rmse": 0.34879819468338735
+}

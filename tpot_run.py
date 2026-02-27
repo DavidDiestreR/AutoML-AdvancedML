@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import inspect
 import json
+import os
 import time
 from pathlib import Path
 from pprint import pformat
@@ -68,10 +69,11 @@ def _build_tpot_regressor(
         ) from exc
 
     signature = inspect.signature(TPOTRegressor.__init__)
+    fixed_n_jobs = max(1, int(os.cpu_count() or 1))
     kwargs = {
         "cv": k_fold,
         "random_state": random_state,
-        "n_jobs": -1,
+        "n_jobs": fixed_n_jobs,
     }
     # TPOT versions differ here: some use `verbosity`, others `verbose`.
     if "verbosity" in signature.parameters:
@@ -85,7 +87,7 @@ def _build_tpot_regressor(
         kwargs["generations"] = 100
         kwargs["population_size"] = 50
 
-    return TPOTRegressor(**kwargs)
+    return TPOTRegressor(**kwargs), fixed_n_jobs
 
 
 def main(
@@ -119,7 +121,7 @@ def main(
     )
 
     max_time_mins = float(execution_time) / 60.0
-    tpot = _build_tpot_regressor(
+    tpot, fixed_n_jobs = _build_tpot_regressor(
         max_time_mins=max_time_mins,
         k_fold=k_fold,
         random_state=seed,
@@ -152,15 +154,29 @@ def main(
     }
 
     summary_file = results_path / f"{dataset_file.stem}_run_summary.json"
-    predictions_file = results_path / f"{dataset_file.stem}_test_predictions.csv"
     pipeline_file = results_path / f"{dataset_file.stem}_best_pipeline.py"
+    pipeline_fallback_file = results_path / f"{dataset_file.stem}_best_pipeline.txt"
 
     with summary_file.open("w", encoding="utf-8") as f:
         json.dump(run_summary, f, indent=2, default=_json_default)
 
-    predictions_df = pd.DataFrame({"y_true": y_test.to_numpy(), "y_pred": np.asarray(y_pred)})
-    predictions_df.to_csv(predictions_file, index=False)
-    tpot.export(str(pipeline_file))
+    pipeline_export_mode = "none"
+    exported_pipeline_path = None
+    if hasattr(tpot, "export"):
+        tpot.export(str(pipeline_file))
+        pipeline_export_mode = "python_export"
+        exported_pipeline_path = str(pipeline_file)
+    else:
+        fitted_pipeline = getattr(tpot, "fitted_pipeline_", None)
+        pipeline_repr = repr(fitted_pipeline) if fitted_pipeline is not None else "None"
+        pipeline_fallback_file.write_text(pipeline_repr + "\n", encoding="utf-8")
+        pipeline_export_mode = "repr_fallback"
+        exported_pipeline_path = str(pipeline_fallback_file)
+
+    run_summary["pipeline_export_mode"] = pipeline_export_mode
+    run_summary["pipeline_file"] = exported_pipeline_path
+    with summary_file.open("w", encoding="utf-8") as f:
+        json.dump(run_summary, f, indent=2, default=_json_default)
 
     print(
         "TPOT run finished.\n"
@@ -175,10 +191,9 @@ def main(
         f" max_time_mins: {max_time_mins}\n"
         f" test_size: {test_size}\n"
         f" seed: {seed}\n"
-        " n_jobs: -1 (fixed)\n"
+        f" n_jobs: {fixed_n_jobs} (fixed to cpu_count)\n"
         f" run_summary_file: {summary_file}\n"
-        f" predictions_file: {predictions_file}\n"
-        f" pipeline_file: {pipeline_file}\n"
+        f" pipeline_file: {exported_pipeline_path}\n"
         f" run_summary:\n{pformat(run_summary, sort_dicts=False)}"
     )
 
