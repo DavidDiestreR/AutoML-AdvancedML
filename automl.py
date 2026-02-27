@@ -76,7 +76,7 @@ def _decrease_temperature(
     initial_temperature: float,
     elapsed_time: float,
     execution_time: float = 3600.0,
-    min_temperature: float = 1e-3,
+    min_temperature: float = 1e-4,
 ) -> float:
     """Time-based exponential cooling: reach T_min at `execution_time` seconds."""
     if execution_time <= 0:
@@ -152,11 +152,11 @@ def _generate_neighboring_state(
 def main(
     dataset_name: str,
     k_fold: int = 3,
-    temperature: float = 0.3,
-    model_temperature_factor: float = 6.0,
+    temperature: float = 0.05,
+    model_temperature_factor: float = 2.0,
     p_change_model: float = 0.35,
     execution_time: float = 3600.0,
-    min_temperature: float = 1e-3,
+    min_temperature: float = 1e-4,
     seed: int | None = None,
 ) -> None:
     if not dataset_name or not str(dataset_name).strip():
@@ -360,15 +360,15 @@ if __name__ == "__main__":
         "-T",
         "--temperature",
         type=float,
-        default=0.3,
-        help="Initial temperature for the search (default: 0.3).",
+        default=0.05,
+        help="Initial temperature for the search (default: 0.05).",
     )
     parser.add_argument(
         "-m",
         "--model-temperature-factor",
         type=float,
-        default=6.0,
-        help="Positive factor (>0) to scale model-change exploration temperature (default: 6.0).",
+        default=2.0,
+        help="Positive factor (>0) to scale model-change exploration temperature (default: 2.0).",
     )
     parser.add_argument(
         "-p",
@@ -388,8 +388,8 @@ if __name__ == "__main__":
         "-t",
         "--min-temperature",
         type=float,
-        default=1e-3,
-        help="Minimum temperature stopping threshold (default: 1e-3).",
+        default=1e-4,
+        help="Minimum temperature stopping threshold (default: 1e-4).",
     )
     parser.add_argument(
         "-s",
