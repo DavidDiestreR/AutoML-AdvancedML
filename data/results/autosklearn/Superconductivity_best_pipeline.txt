@@ -1,0 +1,267 @@
+Auto-sklearn selected pipeline(s):
+Ensemble size: 14
+
+Pipeline #1
+weight: 0.260000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.7727512096172742,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.22461598115758682,
+ 'feature_preprocessor:__choice__': 'feature_agglomeration',
+ 'feature_preprocessor:feature_agglomeration:affinity': 'manhattan',
+ 'feature_preprocessor:feature_agglomeration:linkage': 'complete',
+ 'feature_preprocessor:feature_agglomeration:n_clusters': 21,
+ 'feature_preprocessor:feature_agglomeration:pooling_func': 'max',
+ 'regressor:__choice__': 'gradient_boosting',
+ 'regressor:gradient_boosting:early_stop': 'train',
+ 'regressor:gradient_boosting:l2_regularization': 2.208787572338781e-05,
+ 'regressor:gradient_boosting:learning_rate': 0.036087332404571744,
+ 'regressor:gradient_boosting:loss': 'least_squares',
+ 'regressor:gradient_boosting:max_bins': 255,
+ 'regressor:gradient_boosting:max_depth': 'None',
+ 'regressor:gradient_boosting:max_leaf_nodes': 64,
+ 'regressor:gradient_boosting:min_samples_leaf': 3,
+ 'regressor:gradient_boosting:n_iter_no_change': 18,
+ 'regressor:gradient_boosting:scoring': 'loss',
+ 'regressor:gradient_boosting:tol': 1e-07}
+
+Pipeline #2
+weight: 0.180000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'quantile_transformer',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:n_quantiles': 269,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:output_distribution': 'normal',
+ 'feature_preprocessor:__choice__': 'extra_trees_preproc_for_regression',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:bootstrap': 'False',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:criterion': 'mse',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_depth': 'None',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_features': 0.91303156048626,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_leaf_nodes': 'None',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_leaf': 14,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_split': 2,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_weight_fraction_leaf': 0.0,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:n_estimators': 100,
+ 'regressor:__choice__': 'gradient_boosting',
+ 'regressor:gradient_boosting:early_stop': 'train',
+ 'regressor:gradient_boosting:l2_regularization': 0.00010816062210299827,
+ 'regressor:gradient_boosting:learning_rate': 0.7349779616227079,
+ 'regressor:gradient_boosting:loss': 'least_squares',
+ 'regressor:gradient_boosting:max_bins': 255,
+ 'regressor:gradient_boosting:max_depth': 'None',
+ 'regressor:gradient_boosting:max_leaf_nodes': 6,
+ 'regressor:gradient_boosting:min_samples_leaf': 3,
+ 'regressor:gradient_boosting:n_iter_no_change': 18,
+ 'regressor:gradient_boosting:scoring': 'loss',
+ 'regressor:gradient_boosting:tol': 1e-07}
+
+Pipeline #3
+weight: 0.100000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'minmax',
+ 'feature_preprocessor:__choice__': 'fast_ica',
+ 'feature_preprocessor:fast_ica:algorithm': 'parallel',
+ 'feature_preprocessor:fast_ica:fun': 'exp',
+ 'feature_preprocessor:fast_ica:whiten': 'False',
+ 'regressor:__choice__': 'libsvm_svr',
+ 'regressor:libsvm_svr:C': 194.03096694114694,
+ 'regressor:libsvm_svr:epsilon': 0.0010214279074797082,
+ 'regressor:libsvm_svr:gamma': 0.20113065159176252,
+ 'regressor:libsvm_svr:kernel': 'rbf',
+ 'regressor:libsvm_svr:max_iter': -1,
+ 'regressor:libsvm_svr:shrinking': 'True',
+ 'regressor:libsvm_svr:tol': 0.0206281932709369}
+
+Pipeline #4
+weight: 0.100000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.8206881128050196,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.006512427025124199,
+ 'feature_preprocessor:__choice__': 'extra_trees_preproc_for_regression',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:bootstrap': 'False',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:criterion': 'mse',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_depth': 'None',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_features': 1.0,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:max_leaf_nodes': 'None',
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_leaf': 1,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_split': 2,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:min_weight_fraction_leaf': 0.0,
+ 'feature_preprocessor:extra_trees_preproc_for_regression:n_estimators': 100,
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 4,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #5
+weight: 0.100000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'quantile_transformer',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:n_quantiles': 509,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:output_distribution': 'uniform',
+ 'feature_preprocessor:__choice__': 'no_preprocessing',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 1,
+ 'regressor:k_nearest_neighbors:p': 2,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #6
+weight: 0.060000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
+ 'feature_preprocessor:__choice__': 'select_rates_regression',
+ 'feature_preprocessor:select_rates_regression:alpha': 0.1803453708035971,
+ 'feature_preprocessor:select_rates_regression:mode': 'fpr',
+ 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 2,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'distance'}
+
+Pipeline #7
+weight: 0.040000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'quantile_transformer',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:n_quantiles': 920,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:quantile_transformer:output_distribution': 'normal',
+ 'feature_preprocessor:__choice__': 'select_rates_regression',
+ 'feature_preprocessor:select_rates_regression:alpha': 0.03862691274299918,
+ 'feature_preprocessor:select_rates_regression:mode': 'fwe',
+ 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 2,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #8
+weight: 0.040000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'minmax',
+ 'feature_preprocessor:__choice__': 'select_rates_regression',
+ 'feature_preprocessor:select_rates_regression:alpha': 0.052167455412690925,
+ 'feature_preprocessor:select_rates_regression:mode': 'fpr',
+ 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'decision_tree',
+ 'regressor:decision_tree:criterion': 'mse',
+ 'regressor:decision_tree:max_depth_factor': 1.7500412436480297,
+ 'regressor:decision_tree:max_features': 1.0,
+ 'regressor:decision_tree:max_leaf_nodes': 'None',
+ 'regressor:decision_tree:min_impurity_decrease': 0.0,
+ 'regressor:decision_tree:min_samples_leaf': 18,
+ 'regressor:decision_tree:min_samples_split': 12,
+ 'regressor:decision_tree:min_weight_fraction_leaf': 0.0}
+
+Pipeline #9
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.9595395020332128,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.055961553997660785,
+ 'feature_preprocessor:__choice__': 'feature_agglomeration',
+ 'feature_preprocessor:feature_agglomeration:affinity': 'euclidean',
+ 'feature_preprocessor:feature_agglomeration:linkage': 'complete',
+ 'feature_preprocessor:feature_agglomeration:n_clusters': 43,
+ 'feature_preprocessor:feature_agglomeration:pooling_func': 'max',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 1,
+ 'regressor:k_nearest_neighbors:p': 2,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #10
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'minmax',
+ 'feature_preprocessor:__choice__': 'select_rates_regression',
+ 'feature_preprocessor:select_rates_regression:alpha': 0.028748818764522184,
+ 'feature_preprocessor:select_rates_regression:mode': 'fpr',
+ 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 2,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #11
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.7809916899873511,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.02264897875074947,
+ 'feature_preprocessor:__choice__': 'feature_agglomeration',
+ 'feature_preprocessor:feature_agglomeration:affinity': 'euclidean',
+ 'feature_preprocessor:feature_agglomeration:linkage': 'complete',
+ 'feature_preprocessor:feature_agglomeration:n_clusters': 39,
+ 'feature_preprocessor:feature_agglomeration:pooling_func': 'mean',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 1,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'distance'}
+
+Pipeline #12
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'minmax',
+ 'feature_preprocessor:__choice__': 'select_percentile_regression',
+ 'feature_preprocessor:select_percentile_regression:percentile': 46.59554277478974,
+ 'feature_preprocessor:select_percentile_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 1,
+ 'regressor:k_nearest_neighbors:p': 2,
+ 'regressor:k_nearest_neighbors:weights': 'uniform'}
+
+Pipeline #13
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'normalize',
+ 'feature_preprocessor:__choice__': 'fast_ica',
+ 'feature_preprocessor:fast_ica:algorithm': 'deflation',
+ 'feature_preprocessor:fast_ica:fun': 'exp',
+ 'feature_preprocessor:fast_ica:whiten': 'False',
+ 'regressor:__choice__': 'decision_tree',
+ 'regressor:decision_tree:criterion': 'mae',
+ 'regressor:decision_tree:max_depth_factor': 1.265580780004327,
+ 'regressor:decision_tree:max_features': 1.0,
+ 'regressor:decision_tree:max_leaf_nodes': 'None',
+ 'regressor:decision_tree:min_impurity_decrease': 0.0,
+ 'regressor:decision_tree:min_samples_leaf': 5,
+ 'regressor:decision_tree:min_samples_split': 3,
+ 'regressor:decision_tree:min_weight_fraction_leaf': 0.0}
+
+Pipeline #14
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
+ 'feature_preprocessor:__choice__': 'select_rates_regression',
+ 'feature_preprocessor:select_rates_regression:alpha': 0.0889554424812031,
+ 'feature_preprocessor:select_rates_regression:mode': 'fdr',
+ 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
+ 'regressor:__choice__': 'k_nearest_neighbors',
+ 'regressor:k_nearest_neighbors:n_neighbors': 3,
+ 'regressor:k_nearest_neighbors:p': 1,
+ 'regressor:k_nearest_neighbors:weights': 'distance'}

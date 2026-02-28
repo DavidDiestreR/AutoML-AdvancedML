@@ -1,0 +1,19 @@
+{
+  "elapsed_time": 3419.352107981,
+  "dataset_name": "Superconductivity.csv",
+  "target_col": "num__critical_temp",
+  "test_size": 0.2,
+  "k_fold": 3,
+  "execution_time": 3600.0,
+  "per_run_time_limit": 180,
+  "memory_limit_mb": 8192,
+  "seed": 1772314674,
+  "verbosity_arg_kept_for_cli_compat": 2,
+  "n_jobs": 1,
+  "metrics": {
+    "rmse": 0.2596929178870982,
+    "mse": 0.06744041160071512,
+    "mae": 0.15043254245285695,
+    "r2": 0.9308143135757833
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "elapsed_time": 4398.393291100001,
+  "num_iter": 408,
+  "best_model": "randomforest",
+  "params": {
+    "n_estimators": 140,
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "max_features": 0.5
+  },
+  "rmse": 0.27827413694554304,
+  "metrics": {
+    "rmse": 0.27827413694554304,
+    "mse": 0.07748043834198964,
+    "mae": 0.15739146046139277,
+    "r2": 0.9225016989479188
+  }
+}
