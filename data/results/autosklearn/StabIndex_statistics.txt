@@ -1,10 +1,10 @@
 auto-sklearn results:
-  Dataset name: 0327ee27-140b-11f1-927d-00155ddd44b1
+  Dataset name: 103a3064-14a9-11f1-832a-00155dce9c99
   Metric: r2
-  Best validation score: 0.873655
-  Number of target algorithm runs: 15
-  Number of successful target algorithm runs: 8
-  Number of crashed target algorithm runs: 4
-  Number of target algorithms that exceeded the time limit: 2
-  Number of target algorithms that exceeded the memory limit: 1
+  Best validation score: 0.885509
+  Number of target algorithm runs: 218
+  Number of successful target algorithm runs: 147
+  Number of crashed target algorithm runs: 55
+  Number of target algorithms that exceeded the time limit: 9
+  Number of target algorithms that exceeded the memory limit: 7
 

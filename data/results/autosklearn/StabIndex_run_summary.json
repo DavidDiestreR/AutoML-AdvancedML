@@ -1,19 +1,19 @@
 {
-  "elapsed_time": 120.93507473600016,
+  "elapsed_time": 3409.2530549440003,
   "dataset_name": "StabIndex.csv",
   "target_col": "num__cosmic_stability_index",
   "test_size": 0.2,
   "k_fold": 3,
-  "execution_time": 120.0,
-  "per_run_time_limit": 30,
+  "execution_time": 3600.0,
+  "per_run_time_limit": 180,
   "memory_limit_mb": 8192,
-  "seed": 1772217295,
+  "seed": 1772285177,
   "verbosity_arg_kept_for_cli_compat": 2,
   "n_jobs": 1,
   "metrics": {
-    "rmse": 0.33782148707334275,
-    "mse": 0.1141233571284447,
-    "mae": 0.26587088834120104,
-    "r2": 0.8639077272944261
+    "rmse": 0.3301819282695264,
+    "mse": 0.10902010575578269,
+    "mae": 0.2607673419852775,
+    "r2": 0.9023763800966365
   }
 }

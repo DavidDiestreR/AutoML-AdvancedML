@@ -1,19 +1,19 @@
 {
-  "elapsed_time": 123.10572104699997,
+  "elapsed_time": 3410.399882968,
   "dataset_name": "ChocolateSales.csv",
   "target_col": "num__sales",
   "test_size": 0.2,
   "k_fold": 3,
-  "execution_time": 120.0,
-  "per_run_time_limit": 30,
+  "execution_time": 3600.0,
+  "per_run_time_limit": 180,
   "memory_limit_mb": 8192,
-  "seed": 1772216768,
+  "seed": 1772281335,
   "verbosity_arg_kept_for_cli_compat": 2,
   "n_jobs": 1,
   "metrics": {
-    "rmse": 0.046096704010150064,
-    "mse": 0.0021249061205993853,
-    "mae": 0.03689640149559677,
-    "r2": 0.9979192253922358
+    "rmse": 0.025889324055875483,
+    "mse": 0.0006702571000701329,
+    "mae": 0.01604839608734493,
+    "r2": 0.9993012306376206
   }
 }

@@ -1,29 +1,46 @@
 Auto-sklearn selected pipeline(s):
-Ensemble size: 2
+Ensemble size: 4
 
 Pipeline #1
-weight: 0.520000
+weight: 0.900000
 config:
 {'data_preprocessor:__choice__': 'feature_type',
  'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
- 'feature_preprocessor:__choice__': 'extra_trees_preproc_for_regression',
- 'feature_preprocessor:extra_trees_preproc_for_regression:bootstrap': 'True',
- 'feature_preprocessor:extra_trees_preproc_for_regression:criterion': 'friedman_mse',
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_depth': 'None',
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_features': 0.969236220539822,
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_leaf_nodes': 'None',
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_leaf': 1,
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_split': 2,
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_weight_fraction_leaf': 0.0,
- 'feature_preprocessor:extra_trees_preproc_for_regression:n_estimators': 100,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'none',
+ 'feature_preprocessor:__choice__': 'no_preprocessing',
  'regressor:__choice__': 'gaussian_process',
- 'regressor:gaussian_process:alpha': 0.013068012551322245,
- 'regressor:gaussian_process:thetaL': 2.979079708104577e-07,
- 'regressor:gaussian_process:thetaU': 50599.0613366392}
+ 'regressor:gaussian_process:alpha': 1.5184374063811938e-13,
+ 'regressor:gaussian_process:thetaL': 5.5908378448008324e-05,
+ 'regressor:gaussian_process:thetaU': 5972.410179913483}
 
 Pipeline #2
-weight: 0.480000
+weight: 0.060000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.75,
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.24016605171389663,
+ 'feature_preprocessor:__choice__': 'feature_agglomeration',
+ 'feature_preprocessor:feature_agglomeration:affinity': 'cosine',
+ 'feature_preprocessor:feature_agglomeration:linkage': 'average',
+ 'feature_preprocessor:feature_agglomeration:n_clusters': 25,
+ 'feature_preprocessor:feature_agglomeration:pooling_func': 'median',
+ 'regressor:__choice__': 'gradient_boosting',
+ 'regressor:gradient_boosting:early_stop': 'train',
+ 'regressor:gradient_boosting:l2_regularization': 0.0008283488757312295,
+ 'regressor:gradient_boosting:learning_rate': 0.03571312627147225,
+ 'regressor:gradient_boosting:loss': 'least_squares',
+ 'regressor:gradient_boosting:max_bins': 255,
+ 'regressor:gradient_boosting:max_depth': 'None',
+ 'regressor:gradient_boosting:max_leaf_nodes': 9,
+ 'regressor:gradient_boosting:min_samples_leaf': 3,
+ 'regressor:gradient_boosting:n_iter_no_change': 10,
+ 'regressor:gradient_boosting:scoring': 'loss',
+ 'regressor:gradient_boosting:tol': 1e-07}
+
+Pipeline #3
+weight: 0.020000
 config:
 {'data_preprocessor:__choice__': 'feature_type',
  'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
@@ -45,3 +62,27 @@ config:
  'regressor:gradient_boosting:scoring': 'loss',
  'regressor:gradient_boosting:tol': 1e-07,
  'regressor:gradient_boosting:validation_fraction': 0.19819612428903174}
+
+Pipeline #4
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
+ 'feature_preprocessor:__choice__': 'feature_agglomeration',
+ 'feature_preprocessor:feature_agglomeration:affinity': 'manhattan',
+ 'feature_preprocessor:feature_agglomeration:linkage': 'average',
+ 'feature_preprocessor:feature_agglomeration:n_clusters': 25,
+ 'feature_preprocessor:feature_agglomeration:pooling_func': 'median',
+ 'regressor:__choice__': 'gradient_boosting',
+ 'regressor:gradient_boosting:early_stop': 'train',
+ 'regressor:gradient_boosting:l2_regularization': 0.0008244211859655428,
+ 'regressor:gradient_boosting:learning_rate': 0.027751055870065825,
+ 'regressor:gradient_boosting:loss': 'least_squares',
+ 'regressor:gradient_boosting:max_bins': 255,
+ 'regressor:gradient_boosting:max_depth': 'None',
+ 'regressor:gradient_boosting:max_leaf_nodes': 8,
+ 'regressor:gradient_boosting:min_samples_leaf': 3,
+ 'regressor:gradient_boosting:n_iter_no_change': 11,
+ 'regressor:gradient_boosting:scoring': 'loss',
+ 'regressor:gradient_boosting:tol': 1e-07}

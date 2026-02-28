@@ -1,111 +1,82 @@
 Auto-sklearn selected pipeline(s):
-Ensemble size: 5
+Ensemble size: 4
 
 Pipeline #1
-weight: 0.780000
-config:
-{'data_preprocessor:__choice__': 'feature_type',
- 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
- 'feature_preprocessor:__choice__': 'extra_trees_preproc_for_regression',
- 'feature_preprocessor:extra_trees_preproc_for_regression:bootstrap': 'False',
- 'feature_preprocessor:extra_trees_preproc_for_regression:criterion': 'mse',
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_depth': 'None',
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_features': 0.7631509999921062,
- 'feature_preprocessor:extra_trees_preproc_for_regression:max_leaf_nodes': 'None',
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_leaf': 2,
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_samples_split': 2,
- 'feature_preprocessor:extra_trees_preproc_for_regression:min_weight_fraction_leaf': 0.0,
- 'feature_preprocessor:extra_trees_preproc_for_regression:n_estimators': 100,
- 'regressor:__choice__': 'mlp',
- 'regressor:mlp:activation': 'relu',
- 'regressor:mlp:alpha': 6.037842605388564e-07,
- 'regressor:mlp:batch_size': 'auto',
- 'regressor:mlp:beta_1': 0.9,
- 'regressor:mlp:beta_2': 0.999,
- 'regressor:mlp:early_stopping': 'valid',
- 'regressor:mlp:epsilon': 1e-08,
- 'regressor:mlp:hidden_layer_depth': 3,
- 'regressor:mlp:learning_rate_init': 0.0001120732057918536,
- 'regressor:mlp:n_iter_no_change': 32,
- 'regressor:mlp:num_nodes_per_layer': 100,
- 'regressor:mlp:shuffle': 'True',
- 'regressor:mlp:solver': 'adam',
- 'regressor:mlp:tol': 0.0001,
- 'regressor:mlp:validation_fraction': 0.1}
-
-Pipeline #2
-weight: 0.080000
-config:
-{'data_preprocessor:__choice__': 'feature_type',
- 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
- 'feature_preprocessor:__choice__': 'no_preprocessing',
- 'regressor:__choice__': 'gradient_boosting',
- 'regressor:gradient_boosting:early_stop': 'train',
- 'regressor:gradient_boosting:l2_regularization': 0.005746611563553693,
- 'regressor:gradient_boosting:learning_rate': 0.0913971028976721,
- 'regressor:gradient_boosting:loss': 'least_squares',
- 'regressor:gradient_boosting:max_bins': 255,
- 'regressor:gradient_boosting:max_depth': 'None',
- 'regressor:gradient_boosting:max_leaf_nodes': 9,
- 'regressor:gradient_boosting:min_samples_leaf': 2,
- 'regressor:gradient_boosting:n_iter_no_change': 20,
- 'regressor:gradient_boosting:scoring': 'loss',
- 'regressor:gradient_boosting:tol': 1e-07}
-
-Pipeline #3
-weight: 0.060000
+weight: 0.740000
 config:
 {'data_preprocessor:__choice__': 'feature_type',
  'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_max': 0.7912621507143142,
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:robust_scaler:q_min': 0.2637968890661204,
- 'feature_preprocessor:__choice__': 'no_preprocessing',
- 'regressor:__choice__': 'gradient_boosting',
- 'regressor:gradient_boosting:early_stop': 'off',
- 'regressor:gradient_boosting:l2_regularization': 5.997418027353535e-10,
- 'regressor:gradient_boosting:learning_rate': 0.12286466971783992,
- 'regressor:gradient_boosting:loss': 'least_squares',
- 'regressor:gradient_boosting:max_bins': 255,
- 'regressor:gradient_boosting:max_depth': 'None',
- 'regressor:gradient_boosting:max_leaf_nodes': 26,
- 'regressor:gradient_boosting:min_samples_leaf': 8,
- 'regressor:gradient_boosting:scoring': 'loss',
- 'regressor:gradient_boosting:tol': 1e-07}
-
-Pipeline #4
-weight: 0.040000
-config:
-{'data_preprocessor:__choice__': 'feature_type',
- 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
  'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize',
- 'feature_preprocessor:__choice__': 'select_rates_regression',
- 'feature_preprocessor:select_rates_regression:alpha': 0.43441750135120694,
- 'feature_preprocessor:select_rates_regression:mode': 'fpr',
- 'feature_preprocessor:select_rates_regression:score_func': 'f_regression',
- 'regressor:__choice__': 'k_nearest_neighbors',
- 'regressor:k_nearest_neighbors:n_neighbors': 2,
- 'regressor:k_nearest_neighbors:p': 2,
- 'regressor:k_nearest_neighbors:weights': 'distance'}
-
-Pipeline #5
-weight: 0.040000
-config:
-{'data_preprocessor:__choice__': 'feature_type',
- 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'mean',
- 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'normalize',
  'feature_preprocessor:__choice__': 'polynomial',
  'feature_preprocessor:polynomial:degree': 2,
+ 'feature_preprocessor:polynomial:include_bias': 'False',
+ 'feature_preprocessor:polynomial:interaction_only': 'False',
+ 'regressor:__choice__': 'ard_regression',
+ 'regressor:ard_regression:alpha_1': 0.00018112737630068145,
+ 'regressor:ard_regression:alpha_2': 3.137419774817159e-06,
+ 'regressor:ard_regression:fit_intercept': 'True',
+ 'regressor:ard_regression:lambda_1': 8.465089714186059e-08,
+ 'regressor:ard_regression:lambda_2': 8.572875823118617e-06,
+ 'regressor:ard_regression:n_iter': 300,
+ 'regressor:ard_regression:threshold_lambda': 4443.858695128893,
+ 'regressor:ard_regression:tol': 0.0014291386185920278}
+
+Pipeline #2
+weight: 0.140000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'none',
+ 'feature_preprocessor:__choice__': 'polynomial',
+ 'feature_preprocessor:polynomial:degree': 3,
+ 'feature_preprocessor:polynomial:include_bias': 'False',
+ 'feature_preprocessor:polynomial:interaction_only': 'False',
+ 'regressor:__choice__': 'ard_regression',
+ 'regressor:ard_regression:alpha_1': 0.0001410104302559903,
+ 'regressor:ard_regression:alpha_2': 2.2794146936767394e-07,
+ 'regressor:ard_regression:fit_intercept': 'True',
+ 'regressor:ard_regression:lambda_1': 2.979497249830933e-08,
+ 'regressor:ard_regression:lambda_2': 6.071460507289707e-06,
+ 'regressor:ard_regression:n_iter': 300,
+ 'regressor:ard_regression:threshold_lambda': 12761.326622139642,
+ 'regressor:ard_regression:tol': 0.0009197167862206039}
+
+Pipeline #3
+weight: 0.100000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'none',
+ 'feature_preprocessor:__choice__': 'polynomial',
+ 'feature_preprocessor:polynomial:degree': 3,
  'feature_preprocessor:polynomial:include_bias': 'True',
  'feature_preprocessor:polynomial:interaction_only': 'False',
  'regressor:__choice__': 'ard_regression',
- 'regressor:ard_regression:alpha_1': 0.0007694645303288904,
- 'regressor:ard_regression:alpha_2': 6.907464089785431e-06,
+ 'regressor:ard_regression:alpha_1': 1e-06,
+ 'regressor:ard_regression:alpha_2': 1.6229039564683066e-07,
  'regressor:ard_regression:fit_intercept': 'True',
- 'regressor:ard_regression:lambda_1': 5.725240603355948e-06,
- 'regressor:ard_regression:lambda_2': 2.2747405613470773e-05,
+ 'regressor:ard_regression:lambda_1': 1.4028425163973743e-06,
+ 'regressor:ard_regression:lambda_2': 4.5112950888833767e-07,
  'regressor:ard_regression:n_iter': 300,
- 'regressor:ard_regression:threshold_lambda': 58747.57814168738,
- 'regressor:ard_regression:tol': 5.818442213575333e-05}
+ 'regressor:ard_regression:threshold_lambda': 6627.265124198165,
+ 'regressor:ard_regression:tol': 0.0012009339919586573}
+
+Pipeline #4
+weight: 0.020000
+config:
+{'data_preprocessor:__choice__': 'feature_type',
+ 'data_preprocessor:feature_type:numerical_transformer:imputation:strategy': 'median',
+ 'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'minmax',
+ 'feature_preprocessor:__choice__': 'polynomial',
+ 'feature_preprocessor:polynomial:degree': 3,
+ 'feature_preprocessor:polynomial:include_bias': 'True',
+ 'feature_preprocessor:polynomial:interaction_only': 'False',
+ 'regressor:__choice__': 'ard_regression',
+ 'regressor:ard_regression:alpha_1': 0.0007994233061643427,
+ 'regressor:ard_regression:alpha_2': 4.841772037579523e-07,
+ 'regressor:ard_regression:fit_intercept': 'True',
+ 'regressor:ard_regression:lambda_1': 1.0536470744060293e-10,
+ 'regressor:ard_regression:lambda_2': 3.3787035723135463e-09,
+ 'regressor:ard_regression:n_iter': 300,
+ 'regressor:ard_regression:threshold_lambda': 2238.5257203817328,
+ 'regressor:ard_regression:tol': 0.011552817985703267}
