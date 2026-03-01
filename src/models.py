@@ -623,4 +623,3 @@ class MLP:
             "alpha": float(new_alpha),
             "learning_rate_init": float(new_lr)
         }
-
