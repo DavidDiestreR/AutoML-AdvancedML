@@ -6,21 +6,21 @@ Course project for Advanced ML focused on creating a custom AutoML algorithm and
 
 ```
 AutoML-AdvancedML/
-├─ data/
-│   ├─ raw/
-│   ├─ processed/
-│   └─ results/
-├─ notebooks/
-│   ├─ compare_results.ipynb
-│   └─ preprocessing.ipynb
-├─ src/
-│   ├─ evaluation.py
-│   └─ models.py
-├─ automl.py
-├─ tpot_run.py
-├─ autosklearn_run.py
-├─ requirements.txt
-└─ README.md
+|-- data/
+|   |-- raw/
+|   |-- processed/
+|   `-- results/
+|-- notebooks/
+|   |-- compare_results.ipynb
+|   `-- preprocessing.ipynb
+|-- src/
+|   |-- evaluation.py
+|   `-- models.py
+|-- automl.py
+|-- tpot_run.py
+|-- autosklearn_run.py
+|-- requirements.txt
+`-- README.md
 ```
 
 ## Core idea of `automl.py`
@@ -45,6 +45,14 @@ conda install -c conda-forge auto-sklearn
 
 Important: `auto-sklearn` must be installed and executed on Linux (Ubuntu). If you are on Windows, run `autosklearn_run.py` from WSL Ubuntu or a Linux machine.
 
+## Dataset links
+
+Replace these placeholder URLs with your real dataset links:
+
+- [StabIndex](https://www.kaggle.com/competitions/tda-aiml-cosmic-stability-problem-0f3ebc/overview)
+- [Superconductivity](https://archive.ics.uci.edu/dataset/464/superconductivty+data)
+- [ChocolateSales](https://www.kaggle.com/competitions/sweet-regression-prediction-of-chocolate-sales/overview)
+
 ## How to run
 
 Use any dataset in `data/processed`.
@@ -64,3 +72,4 @@ python automl.py -h
 python tpot_run.py -h
 python autosklearn_run.py -h
 ```
+
