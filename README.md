@@ -4,23 +4,23 @@ Course project for Advanced ML focused on creating a custom AutoML algorithm and
 
 ## Project structure
 
-```text
+```
 AutoML-AdvancedML/
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── results/
-├── notebooks/
-│   ├── compare_results.ipynb
-│   └── preprocessing.ipynb
-├── src/
-│   ├── evaluation.py
-│   └── models.py
-├── automl.py
-├── tpot_run.py
-├── autosklearn_run.py
-├── requirements.txt
-└── README.md
+├─ data/
+│   ├─ raw/
+│   ├─ processed/
+│   └─ results/
+├─ notebooks/
+│   ├─ compare_results.ipynb
+│   └─ preprocessing.ipynb
+├─ src/
+│   ├─ evaluation.py
+│   └─ models.py
+├─ automl.py
+├─ tpot_run.py
+├─ autosklearn_run.py
+├─ requirements.txt
+└─ README.md
 ```
 
 ## Core idea of `automl.py`
