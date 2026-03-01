@@ -8,6 +8,9 @@ tpot>=0.12
 dask>=2024.1.0
 distributed>=2024.1.0
 
+# auto-sklearn baseline (Linux/Ubuntu required)
+auto-sklearn>=0.15
+
 # Notebooks / plotting
 matplotlib>=3.7
 jupyter>=1.0
