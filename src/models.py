@@ -12,7 +12,7 @@ class PolynomialRegressorSA:
     API:
       - fit(X, y)
       - predict(X)
-      - neighbour(rng) -> new instance with nearby hyperparams
+      - neighbour(rng) -> dict with nearby hyperparams
     """
 
     def __init__(
@@ -201,7 +201,7 @@ class KNNRegressor:
     API:
       - fit(X, y)
       - predict(X)
-      - neighbour(rng) -> new instance with nearby hyperparams
+      - neighbour(rng) -> dict with nearby hyperparams
     """
 
     def __init__(
@@ -316,7 +316,7 @@ class RandomForestRegressorSA:
     API:
       - fit(X, y)
       - predict(X)
-      - neighbour(rng) -> new instance with nearby hyperparams
+      - neighbour(rng) -> dict with nearby hyperparams
     """
 
     def __init__(
@@ -458,7 +458,7 @@ class MLP:
     API:
       - fit(X, y)
       - predict(X)
-      - neighbour(rng) -> new instance with nearby hyperparams
+      - neighbour(rng) -> dict with nearby hyperparams
     """
 
     def __init__(
@@ -623,3 +623,4 @@ class MLP:
             "alpha": float(new_alpha),
             "learning_rate_init": float(new_lr)
         }
+
