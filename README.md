@@ -1,4 +1,4 @@
-﻿# AutoML-AdvancedML
+# AutoML-AdvancedML
 
 Course project for Advanced ML focused on creating a custom AutoML algorithm and comparing it with TPOT and Autoskl.
 
@@ -6,21 +6,21 @@ Course project for Advanced ML focused on creating a custom AutoML algorithm and
 
 ```
 AutoML-AdvancedML/
-|-- data/
-|   |-- raw/
-|   |-- processed/
-|   `-- results/
-|-- notebooks/
-|   |-- compare_results.ipynb
-|   `-- preprocessing.ipynb
-|-- src/
-|   |-- evaluation.py
-|   `-- models.py
-|-- automl.py
-|-- tpot_run.py
-|-- autosklearn_run.py
-|-- requirements.txt
-`-- README.md
+├─ data/
+│   ├─ raw/
+│   ├─ processed/
+│   └─ results/
+├─ notebooks/
+│   ├─ compare_results.ipynb
+│   └─ preprocessing.ipynb
+├─ src/
+│   ├─ evaluation.py
+│   └─ models.py
+├─ automl.py
+├─ tpot_run.py
+├─ autosklearn_run.py
+├─ requirements.txt
+└─ README.md
 ```
 
 ## Core idea of `automl.py`
@@ -72,4 +72,5 @@ python automl.py -h
 python tpot_run.py -h
 python autosklearn_run.py -h
 ```
+
 
